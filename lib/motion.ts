@@ -114,14 +114,14 @@ export const buttonHover = { scale: 1.03 }
 
 // ─── Floating decoration ─────────────────────────────────────────────────────
 
-export const floatY = {
+export const floatY: Variants = {
   animate: {
     y: [0, -10, 0],
     transition: { repeat: Infinity, duration: 5, ease: 'easeInOut' },
   },
 }
 
-export const floatYSlow = {
+export const floatYSlow: Variants = {
   animate: {
     y: [0, -6, 0],
     transition: { repeat: Infinity, duration: 7, ease: 'easeInOut' },

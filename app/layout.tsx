@@ -1,9 +1,13 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Cormorant_Garamond, Inter } from 'next/font/google'
+import { BackToTop } from '@/components/ui/back-to-top'
+import { ScrollProgress } from '@/components/scroll-progress'
+import { AuthDialog } from '@/components/auth-dialog'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { Toaster } from '@/components/ui/sonner'
+import { AuthProvider } from '@/lib/auth-store'
 import { StudioProvider } from '@/lib/studio-store'
 import './globals.css'
 
@@ -24,14 +28,14 @@ export const metadata: Metadata = {
     'Design a fragrance that is truly yours. Layer top, heart and base notes, get guided by our scent concierge, and preview your bottle before you buy.',
   generator: 'v0.app',
   icons: {
-    icon: '/images/scentbuild-mark.png',
-    apple: '/images/scentbuild-mark.png',
+    icon: '/images/newlogo.png',
+    apple: '/images/newlogo.png',
   },
 }
 
 export const viewport: Viewport = {
   colorScheme: 'light',
-  themeColor: '#24101F',
+  themeColor: '#051334',
 }
 
 export default function RootLayout({
@@ -40,22 +44,34 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" className={`${inter.variable} ${cormorant.variable} bg-background`}>
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      className={`${inter.variable} ${cormorant.variable} bg-background`}
+    >
       <body className="flex min-h-dvh flex-col antialiased">
-        <StudioProvider>
-          <a
-            href="#main"
-            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-espresso focus:px-4 focus:py-2 focus:text-ivory"
-          >
-            Skip to content
-          </a>
-          <SiteHeader />
-          <main id="main" className="flex-1">
-            {children}
-          </main>
-          <SiteFooter />
-          <Toaster position="bottom-center" />
-        </StudioProvider>
+        <AuthProvider>
+          <StudioProvider>
+            <ScrollProgress />
+            <a
+              href="#main"
+              className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-ink focus:px-4 focus:py-2 focus:text-ice"
+            >
+              Skip to content
+            </a>
+            <SiteHeader />
+            <main id="main" className="flex-1">
+              {children}
+            </main>
+            <SiteFooter />
+            <Toaster
+              position="bottom-center"
+              mobileOffset={{ bottom: '4.5rem' }}
+            />
+            <BackToTop />
+            <AuthDialog />
+          </StudioProvider>
+        </AuthProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

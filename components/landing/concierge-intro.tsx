@@ -31,10 +31,10 @@ export function ConciergeIntro() {
   return (
     <section
       aria-labelledby="concierge-heading"
-      className="bg-[#24101F] text-[#FAF7F0]"
+      className="bg-gradient-to-b from-[#F1F7FD] via-[#E4EEF8] to-[#F5F9FD] text-[#0E1B33]"
     >
       {/* Top border shimmer */}
-      <div aria-hidden="true" className="h-px bg-gradient-to-r from-transparent via-[#B88A3B]/30 to-transparent" />
+      <div aria-hidden="true" className="h-px bg-gradient-to-r from-transparent via-[#57B8F2]/40 to-transparent" />
 
       <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 md:grid-cols-2 md:py-28 lg:px-8">
 
@@ -46,7 +46,7 @@ export function ConciergeIntro() {
           viewport={{ once: true, margin: '-60px' }}
           variants={slideLeft}
         >
-          <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem]">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] shadow-[0_24px_60px_rgba(16,55,120,0.18)]">
             <Image
               src="/images/concierge.png"
               alt="A perfumer's workbench with glass vials, scent blotters and jasmine flowers in candlelight"
@@ -54,10 +54,10 @@ export function ConciergeIntro() {
               sizes="(min-width: 768px) 50vw, 100vw"
               className="object-cover"
             />
-            {/* Warm gold overlay */}
+            {/* Azure overlay */}
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-[#24101F]/50 via-transparent to-[#B88A3B]/10"
+              className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-[#051334]/35 via-transparent to-[#57B8F2]/15"
             />
           </div>
 
@@ -67,9 +67,9 @@ export function ConciergeIntro() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.5, type: 'spring', stiffness: 200, damping: 20 }}
-            className="absolute -right-4 -top-4 rounded-2xl border border-[#FAF7F0]/10 bg-[#351329]/90 p-4 shadow-xl backdrop-blur-sm md:right-4 md:top-4"
+            className="absolute -right-4 -top-4 rounded-2xl border border-white/70 bg-white/85 p-4 shadow-xl backdrop-blur-sm md:right-4 md:top-4"
           >
-            <Sparkles className="size-5 text-[#D4B16A]" aria-hidden="true" />
+            <Sparkles className="size-5 text-[#1E63C8]" aria-hidden="true" />
           </motion.div>
         </motion.div>
 
@@ -83,31 +83,31 @@ export function ConciergeIntro() {
         >
           <motion.p
             variants={fadeUp}
-            className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.35em] text-[#D4B16A]"
+            className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.35em] text-[#1E63C8]"
           >
-            <span className="inline-block h-px w-6 bg-[#D4B16A]/50" aria-hidden="true" />
+            <span className="inline-block h-px w-6 bg-[#1E63C8]/50" aria-hidden="true" />
             Scent concierge
           </motion.p>
 
           <motion.h2
             id="concierge-heading"
             variants={fadeUp}
-            className="mt-4 font-serif text-4xl font-medium leading-tight sm:text-5xl"
+            className="mt-4 font-serif text-4xl font-medium leading-tight text-[#0A1A52] sm:text-5xl"
           >
             Not sure where to begin?{' '}
-            <em className="text-[#D4B16A]">Describe a feeling.</em>
+            <em className="text-[#1E63C8]">Describe a feeling.</em>
           </motion.h2>
 
           <motion.p
             variants={fadeUp}
-            className="mt-5 leading-relaxed text-[#FAF7F0]/65"
+            className="mt-5 leading-relaxed text-[#5C728F]"
           >
             Tell our concierge about your mood, occasion and the families you love. You'll receive three compatible blends — safe, balanced and bold — ready to load into the builder.
           </motion.p>
 
           {/* Mood chips */}
           <motion.div variants={fadeUp} className="mt-8">
-            <p className="mb-3 text-xs uppercase tracking-[0.25em] text-[#FAF7F0]/40">
+            <p className="mb-3 text-xs uppercase tracking-[0.25em] text-[#8FA3BC]">
               How are you feeling today?
             </p>
             <div className="flex flex-wrap gap-2">
@@ -123,14 +123,14 @@ export function ConciergeIntro() {
                   style={
                     activeMood === mood.value
                       ? {
-                          borderColor: '#B88A3B',
-                          backgroundColor: '#B88A3B22',
-                          color: '#D4B16A',
+                          borderColor: '#1E63C8',
+                          backgroundColor: 'rgba(30,99,200,0.08)',
+                          color: '#1253B8',
                         }
                       : {
-                          borderColor: 'rgba(255,254,252,0.15)',
-                          backgroundColor: 'transparent',
-                          color: 'rgba(250,247,240,0.65)',
+                          borderColor: '#CCDFF0',
+                          backgroundColor: '#FFFFFF',
+                          color: '#5C728F',
                         }
                   }
                 >
@@ -149,7 +149,7 @@ export function ConciergeIntro() {
                 animate={{ opacity: 1, height: 'auto', y: 0 }}
                 exit={{ opacity: 0, height: 0, y: -6 }}
                 transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                className="mt-4 overflow-hidden border-l-2 border-[#B88A3B]/50 pl-4 font-serif text-lg italic text-[#FAF7F0]/75"
+                className="mt-4 overflow-hidden border-l-2 border-[#57B8F2]/60 pl-4 font-serif text-lg italic text-[#0A1A52]/80"
               >
                 {MOOD_COPY[activeMood]}
               </motion.p>
@@ -160,7 +160,7 @@ export function ConciergeIntro() {
           <motion.div variants={fadeUp} className="mt-9">
             <Link
               href={activeMood ? `/concierge?mood=${activeMood}` : '/concierge'}
-              className="inline-flex items-center gap-2 rounded-full bg-[#B88A3B] px-7 py-3.5 font-medium text-[#FAF7F0] transition-colors hover:bg-[#D4B16A]"
+              className="btn-shine inline-flex items-center gap-2 rounded-full bg-[#1E63C8] px-7 py-3.5 font-medium text-[#F5F9FD] shadow-[0_10px_30px_rgba(30,99,200,0.25)] transition-colors hover:bg-[#154FB8]"
             >
               Find my scent <ArrowRight className="size-4" aria-hidden="true" />
             </Link>

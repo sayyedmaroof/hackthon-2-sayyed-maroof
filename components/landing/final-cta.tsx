@@ -10,16 +10,16 @@ export function FinalCta() {
   return (
     <section
       aria-labelledby="cta-heading"
-      className="relative overflow-hidden bg-[#24101F] text-[#FAF7F0]"
+      className="relative overflow-hidden bg-gradient-to-br from-[#D9E9FA] via-[#EFF6FD] to-[#C4DCF4] text-[#0E1B33]"
     >
       {/* Top border shimmer */}
-      <div aria-hidden="true" className="h-px bg-gradient-to-r from-transparent via-[#B88A3B]/30 to-transparent" />
+      <div aria-hidden="true" className="h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
 
       {/* Background atmosphere */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0">
-        <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-[#351329]/40 to-transparent" />
-        <div className="absolute right-0 top-0 h-[500px] w-[400px] rounded-full bg-[#B88A3B]/8 blur-[100px]" />
-        <div className="absolute -left-20 bottom-0 h-[400px] w-[500px] rounded-full bg-[#351329]/50 blur-[80px]" />
+        <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-white/50 to-transparent" />
+        <div className="absolute right-0 top-0 h-[500px] w-[400px] rounded-full bg-[#57B8F2]/20 blur-[100px]" />
+        <div className="absolute -left-20 bottom-0 h-[400px] w-[500px] rounded-full bg-[#1E63C8]/12 blur-[80px]" />
       </div>
 
       <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 md:grid-cols-2 md:py-28 lg:px-8">
@@ -36,11 +36,11 @@ export function FinalCta() {
             {/* Glow */}
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 translate-y-8 scale-75 rounded-full bg-[#B88A3B]/20 blur-[60px]"
+              className="pointer-events-none absolute inset-0 translate-y-8 scale-75 rounded-full bg-[#57B8F2]/30 blur-[60px]"
             />
-            <div className="relative aspect-[3/4] overflow-hidden rounded-[2rem] shadow-[0_32px_80px_rgba(0,0,0,0.5)]">
+            <div className="relative aspect-[3/4] overflow-hidden rounded-[2rem] shadow-[0_32px_70px_rgba(16,55,120,0.25)]">
               <Image
-                src="/images/hero-bottle.png"
+                src="/images/studio-lab.jpg"
                 alt=""
                 fill
                 sizes="(min-width: 768px) 50vw, 80vw"
@@ -48,7 +48,7 @@ export function FinalCta() {
               />
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#24101F]/60 via-transparent to-[#B88A3B]/8"
+                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#051334]/35 via-transparent to-[#57B8F2]/10"
               />
             </div>
           </div>
@@ -64,7 +64,7 @@ export function FinalCta() {
         >
           <motion.p
             variants={fadeUp}
-            className="text-xs font-medium uppercase tracking-[0.35em] text-[#D4B16A]"
+            className="text-xs font-medium uppercase tracking-[0.35em] text-[#1E63C8]"
           >
             Your signature awaits
           </motion.p>
@@ -72,16 +72,18 @@ export function FinalCta() {
           <motion.h2
             id="cta-heading"
             variants={fadeUp}
-            className="mt-5 font-serif text-5xl font-medium leading-[1.06] sm:text-6xl"
+            className="mt-5 font-serif text-5xl font-medium leading-[1.06] text-[#0A1A52] sm:text-6xl"
           >
             Don't just wear a fragrance.
             <br />
-            <em className="text-[#D4B16A]">Create your signature.</em>
+            <em className="bg-gradient-to-r from-[#1E63C8] to-[#57B8F2] bg-clip-text text-transparent">
+              Create your signature.
+            </em>
           </motion.h2>
 
           <motion.p
             variants={fadeUp}
-            className="mt-6 text-lg leading-relaxed text-[#FAF7F0]/65"
+            className="mt-6 text-lg leading-relaxed text-[#0E1B33]/65"
           >
             21 notes. Infinite combinations. One blend that is unmistakably, irrevocably yours.
           </motion.p>
@@ -94,7 +96,7 @@ export function FinalCta() {
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
               <Link
                 href="/builder"
-                className="inline-flex items-center justify-center gap-2.5 rounded-full bg-[#B88A3B] px-8 py-3.5 font-medium text-[#FAF7F0] transition-colors hover:bg-[#D4B16A]"
+                className="btn-shine inline-flex items-center justify-center gap-2.5 rounded-full bg-[#1E63C8] px-8 py-3.5 font-medium text-[#F5F9FD] shadow-[0_10px_30px_rgba(30,99,200,0.3)] transition-colors hover:bg-[#154FB8]"
               >
                 Open the builder
                 <ArrowRight className="size-4" aria-hidden="true" />
@@ -103,7 +105,7 @@ export function FinalCta() {
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
               <Link
                 href="/explore"
-                className="inline-flex items-center justify-center rounded-full border border-[#FAF7F0]/20 px-8 py-3.5 font-medium text-[#FAF7F0]/80 transition-colors hover:border-[#B88A3B]/50 hover:bg-[#B88A3B]/10"
+                className="inline-flex items-center justify-center rounded-full border border-[#0E1B33]/12 bg-white/50 px-8 py-3.5 font-medium text-[#0A1A52]/85 backdrop-blur-sm transition-colors hover:border-[#1E63C8]/40 hover:text-[#1E63C8]"
               >
                 Browse presets
               </Link>
@@ -113,7 +115,7 @@ export function FinalCta() {
           {/* Divider & stats */}
           <motion.dl
             variants={fadeUp}
-            className="mt-12 grid max-w-xs grid-cols-3 gap-6 border-t border-[#FAF7F0]/10 pt-6"
+            className="mt-12 grid max-w-xs grid-cols-3 gap-6 border-t border-[#0E1B33]/10 pt-6"
           >
             {[
               { dt: 'Notes', dd: '21' },
@@ -121,8 +123,8 @@ export function FinalCta() {
               { dt: 'From', dd: '$43' },
             ].map(({ dt, dd }) => (
               <div key={dt}>
-                <dt className="text-[0.65rem] uppercase tracking-[0.25em] text-[#FAF7F0]/40">{dt}</dt>
-                <dd className="mt-1.5 font-serif text-3xl text-[#D4B16A]">{dd}</dd>
+                <dt className="text-[0.65rem] uppercase tracking-[0.25em] text-[#8FA3BC]">{dt}</dt>
+                <dd className="mt-1.5 font-serif text-3xl text-[#1E63C8]">{dd}</dd>
               </div>
             ))}
           </motion.dl>

@@ -1,6 +1,7 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { useAuth } from './auth-store'
 import { DEFAULT_BOTTLE } from './fragrance-data'
 import { createId, sanitizeName, storage } from './storage'
 import { sanitizeNoteIds, validateAdd, type AddResult } from './validation'
@@ -25,6 +26,7 @@ interface StudioContextValue {
   saved: Blend[]
   orders: Order[]
   cartCount: number
+  editingCartItemId: string | null
   addNote: (noteId: string, layer?: Layer) => AddResult
   removeNote: (noteId: string) => void
   replaceNote: (oldId: string | undefined, newId: string) => AddResult
@@ -36,6 +38,8 @@ interface StudioContextValue {
   saveDraft: () => Blend
   deleteSaved: (id: string) => void
   addToCart: (blend?: Blend) => void
+  editCartItem: (itemId: string) => boolean
+  cancelEditCartItem: () => void
   setQuantity: (itemId: string, quantity: number) => void
   removeFromCart: (itemId: string) => void
   clearCart: () => void
@@ -45,11 +49,19 @@ interface StudioContextValue {
 const StudioContext = createContext<StudioContextValue | null>(null)
 
 export function StudioProvider({ children }: { children: React.ReactNode }) {
+  // Auth state drives PostgreSQL sync: signed-in users get their cart and
+  // saved blends stored in the database instead of only in localStorage.
+  const { status: authStatus } = useAuth()
   const [hydrated, setHydrated] = useState(false)
   const [draft, setDraft] = useState<Blend>(emptyDraft)
   const [cart, setCart] = useState<CartItem[]>([])
   const [saved, setSaved] = useState<Blend[]>([])
   const [orders, setOrders] = useState<Order[]>([])
+  const [editingCartItemId, setEditingCartItemId] = useState<string | null>(null)
+
+  const syncedRef = useRef(false)
+  const prevAuthStatus = useRef(authStatus)
+  const pushTimer = useRef<number | undefined>(undefined)
 
   // localStorage is only available after mount; load persisted state once.
   useEffect(() => {
@@ -73,6 +85,73 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (hydrated) storage.saveOrders(orders)
   }, [orders, hydrated])
+
+  // Merge helper: keep server rows, append any local-only entries (by id).
+  const mergeCart = (server: CartItem[], local: CartItem[]): CartItem[] => {
+    const seen = new Set(server.map((item) => item.id))
+    return [...server, ...local.filter((item) => !seen.has(item.id))]
+  }
+  const mergeSaved = (server: Blend[], local: Blend[]): Blend[] => {
+    const seen = new Set(server.map((b) => b.id))
+    return [...server, ...local.filter((b) => !seen.has(b.id))]
+  }
+
+  // On sign-in: pull the account's cart + saved blends and merge with local data.
+  useEffect(() => {
+    if (authStatus !== 'authed' || syncedRef.current) return
+    syncedRef.current = true
+    let cancelled = false
+    ;(async () => {
+      try {
+        const [cartRes, savedRes] = await Promise.all([
+          fetch('/api/cart', { cache: 'no-store' }),
+          fetch('/api/saved', { cache: 'no-store' }),
+        ])
+        if (cancelled) return
+        const cartData = (await cartRes.json().catch(() => null)) as { items?: CartItem[] } | null
+        const savedData = (await savedRes.json().catch(() => null)) as { blends?: Blend[] } | null
+        if (cancelled) return
+        // Hydration may not have finished yet; read the freshest values.
+        setCart((current) => mergeCart(Array.isArray(cartData?.items) ? cartData.items : [], current))
+        setSaved((current) => mergeSaved(Array.isArray(savedData?.blends) ? savedData.blends : [], current))
+      } catch {
+        // Offline or DB down: keep working in memory.
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [authStatus])
+
+  // On sign-out: local cart/saved were account data in the DB; clear them.
+  useEffect(() => {
+    if (prevAuthStatus.current === 'authed' && authStatus === 'guest') {
+      syncedRef.current = false
+      setCart([])
+      setSaved([])
+      setEditingCartItemId(null)
+    }
+    prevAuthStatus.current = authStatus
+  }, [authStatus])
+
+  // While signed in, keep the database in sync with local changes (debounced).
+  useEffect(() => {
+    if (authStatus !== 'authed' || !hydrated || !syncedRef.current) return
+    window.clearTimeout(pushTimer.current)
+    pushTimer.current = window.setTimeout(() => {
+      void fetch('/api/cart', {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ items: cart }),
+      }).catch(() => {})
+      void fetch('/api/saved', {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ blends: saved }),
+      }).catch(() => {})
+    }, 350)
+    return () => window.clearTimeout(pushTimer.current)
+  }, [authStatus, hydrated, cart, saved])
 
   const touch = (blend: Blend): Blend => ({ ...blend, updatedAt: Date.now() })
 
@@ -152,10 +231,42 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
         noteIds: [...source.noteIds],
         bottle: { ...source.bottle },
       }
-      setCart((items) => [...items, { id: createId('item'), blend: snapshot, quantity: 1 }])
+      setEditingCartItemId((editingId) => {
+        if (editingId) {
+          // Editing an existing cart item: replace its blend, keep id + quantity.
+          setCart((items) => {
+            if (!items.some((item) => item.id === editingId)) return [...items, { id: editingId, blend: snapshot, quantity: 1 }]
+            return items.map((item) => (item.id === editingId ? { ...item, blend: snapshot } : item))
+          })
+        } else {
+          setCart((items) => [...items, { id: createId('item'), blend: snapshot, quantity: 1 }])
+        }
+        return null
+      })
     },
     [draft],
   )
+
+  // Load a cart item's blend into the builder so its notes/bottle can be edited;
+  // the next addToCart() updates that item in place instead of adding a new one.
+  const editCartItem = useCallback(
+    (itemId: string): boolean => {
+      const item = cart.find((i) => i.id === itemId)
+      if (!item) return false
+      setEditingCartItemId(itemId)
+      setDraft({
+        ...item.blend,
+        noteIds: [...item.blend.noteIds],
+        bottle: { ...item.blend.bottle },
+      })
+      return true
+    },
+    [cart],
+  )
+
+  const cancelEditCartItem = useCallback(() => {
+    setEditingCartItemId(null)
+  }, [])
 
   const setQuantity = useCallback((itemId: string, quantity: number) => {
     const safe = Math.min(MAX_QTY, Math.max(1, Math.floor(quantity) || 1))
@@ -164,9 +275,13 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
 
   const removeFromCart = useCallback((itemId: string) => {
     setCart((items) => items.filter((item) => item.id !== itemId))
+    setEditingCartItemId((current) => (current === itemId ? null : current))
   }, [])
 
-  const clearCart = useCallback(() => setCart([]), [])
+  const clearCart = useCallback(() => {
+    setCart([])
+    setEditingCartItemId(null)
+  }, [])
 
   const recordOrder = useCallback((order: Order) => {
     setOrders((list) => [order, ...list.filter((o) => o.id !== order.id)])
@@ -180,6 +295,7 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
       saved,
       orders,
       cartCount: cart.reduce((sum, item) => sum + item.quantity, 0),
+      editingCartItemId,
       addNote,
       removeNote,
       replaceNote,
@@ -191,12 +307,14 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
       saveDraft,
       deleteSaved,
       addToCart,
+      editCartItem,
+      cancelEditCartItem,
       setQuantity,
       removeFromCart,
       clearCart,
       recordOrder,
     }),
-    [hydrated, draft, cart, saved, orders, addNote, removeNote, replaceNote, clearDraft, loadBlend, openSaved, setName, setBottle, saveDraft, deleteSaved, addToCart, setQuantity, removeFromCart, clearCart, recordOrder],
+    [hydrated, draft, cart, saved, orders, editingCartItemId, addNote, removeNote, replaceNote, clearDraft, loadBlend, openSaved, setName, setBottle, saveDraft, deleteSaved, addToCart, editCartItem, cancelEditCartItem, setQuantity, removeFromCart, clearCart, recordOrder],
   )
 
   return <StudioContext.Provider value={value}>{children}</StudioContext.Provider>

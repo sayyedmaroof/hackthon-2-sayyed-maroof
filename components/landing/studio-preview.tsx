@@ -53,7 +53,7 @@ export function StudioPreview() {
   return (
     <section
       aria-labelledby="studio-preview-heading"
-      className="bg-[#FAF7F0] py-20 md:py-28"
+      className="bg-[#F5F9FD] py-20 md:py-28"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
@@ -67,20 +67,20 @@ export function StudioPreview() {
         >
           <motion.p
             variants={fadeUp}
-            className="text-xs font-medium uppercase tracking-[0.35em] text-[#B88A3B]"
+            className="text-xs font-medium uppercase tracking-[0.35em] text-[#1E63C8]"
           >
             Interactive preview
           </motion.p>
           <motion.h2
             id="studio-preview-heading"
             variants={fadeUp}
-            className="mt-4 font-serif text-4xl font-medium leading-tight sm:text-5xl text-[#30241F]"
+            className="mt-4 font-serif text-4xl font-medium leading-tight sm:text-5xl text-[#0E1B33]"
           >
             Compose in real time.
             <br />
-            <em className="text-[#B88A3B]">See your blend emerge.</em>
+            <em className="text-[#1E63C8]">See your blend emerge.</em>
           </motion.h2>
-          <motion.p variants={fadeUp} className="mt-4 text-[#8B7B72]">
+          <motion.p variants={fadeUp} className="mt-4 text-[#5C728F]">
             Select a few notes below — the bottle colour and character update instantly.
           </motion.p>
         </motion.div>
@@ -130,12 +130,12 @@ export function StudioPreview() {
                               ? {
                                   borderColor: note.color,
                                   backgroundColor: `${note.color}22`,
-                                  color: '#30241F',
+                                  color: '#0E1B33',
                                 }
                               : {
-                                  borderColor: '#E5D8C4',
-                                  backgroundColor: '#FFFEFC',
-                                  color: '#8B7B72',
+                                  borderColor: '#CCDFF0',
+                                  backgroundColor: '#FDFEFF',
+                                  color: '#5C728F',
                                 }
                           }
                         >
@@ -156,7 +156,7 @@ export function StudioPreview() {
                                 exit={{ scale: 0, opacity: 0 }}
                                 transition={{ type: 'spring', stiffness: 380, damping: 24 }}
                               >
-                                <Check className="size-3.5 text-[#B88A3B]" aria-hidden="true" />
+                                <Check className="size-3.5 text-[#1E63C8]" aria-hidden="true" />
                               </motion.span>
                             )}
                           </AnimatePresence>
@@ -177,15 +177,15 @@ export function StudioPreview() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                  className="mt-4 rounded-2xl border border-[#E5D8C4] bg-[#FFFEFC] p-5"
+                  className="mt-4 rounded-2xl border border-[#CCDFF0] bg-[#FDFEFF] p-5"
                 >
-                  <p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-[#B88A3B]">
+                  <p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-[#1E63C8]">
                     Blend character
                   </p>
-                  <p className="mt-2 font-serif text-2xl text-[#30241F] capitalize">
+                  <p className="mt-2 font-serif text-2xl text-[#0E1B33] capitalize">
                     {profile.character} — {profile.family}
                   </p>
-                  <p className="mt-1 text-sm text-[#8B7B72]">
+                  <p className="mt-1 text-sm text-[#5C728F]">
                     {CHARACTER_COPY[profile.character]}
                   </p>
 
@@ -199,17 +199,17 @@ export function StudioPreview() {
                       ] as const
                     ).map(({ key, label }) => (
                       <div key={key} className="grid grid-cols-[5rem_1fr_2rem] items-center gap-3 text-xs">
-                        <dt className="text-[#8B7B72]">{label}</dt>
+                        <dt className="text-[#5C728F]">{label}</dt>
                         <dd className="contents">
-                          <span className="h-1.5 overflow-hidden rounded-full bg-[#E5D8C4]">
+                          <span className="h-1.5 overflow-hidden rounded-full bg-[#CCDFF0]">
                             <motion.span
-                              className="block h-full rounded-full bg-[#B88A3B]"
+                              className="block h-full rounded-full bg-[#1E63C8]"
                               initial={{ width: 0 }}
                               animate={{ width: `${(profile[key] as number) * 10}%` }}
                               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                             />
                           </span>
-                          <span className="text-right tabular-nums text-[#30241F]">
+                          <span className="text-right tabular-nums text-[#0E1B33]">
                             {(profile[key] as number).toFixed(1)}
                           </span>
                         </dd>
@@ -223,7 +223,7 @@ export function StudioPreview() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="mt-4 rounded-2xl border border-dashed border-[#E5D8C4] p-5 text-center text-sm text-[#8B7B72]"
+                  className="mt-4 rounded-2xl border border-dashed border-[#CCDFF0] p-5 text-center text-sm text-[#5C728F]"
                 >
                   Select at least one note to see your blend character.
                 </motion.div>
@@ -240,11 +240,11 @@ export function StudioPreview() {
             >
               <Link
                 href="/builder"
-                className="inline-flex items-center gap-2 rounded-full bg-[#351329] px-6 py-3 text-sm font-medium text-[#FAF7F0] transition-colors hover:bg-[#B88A3B]"
+                className="inline-flex items-center gap-2 rounded-full bg-[#1E63C8] px-6 py-3 text-sm font-medium text-[#F5F9FD] transition-colors hover:bg-[#154FB8]"
               >
                 Open the full builder <ArrowRight className="size-4" aria-hidden="true" />
               </Link>
-              <p className="mt-2 text-xs text-[#8B7B72]">
+              <p className="mt-2 text-xs text-[#5C728F]">
                 This is a simplified preview. Your saved blends are separate.
               </p>
             </motion.div>
@@ -263,7 +263,7 @@ export function StudioPreview() {
               aria-hidden="true"
               className="pointer-events-none absolute h-64 w-64 rounded-full blur-[80px]"
               style={{
-                backgroundColor: profile?.color ? `${profile.color}40` : '#B88A3B22',
+                backgroundColor: profile?.color ? `${profile.color}40` : '#1E63C822',
               }}
             />
             <div className="relative z-10 w-48">
@@ -275,7 +275,7 @@ export function StudioPreview() {
                 className="drop-shadow-[0_24px_48px_rgba(0,0,0,0.22)]"
               />
             </div>
-            <p className="mt-4 text-center text-xs text-[#8B7B72]">
+            <p className="mt-4 text-center text-xs text-[#5C728F]">
               {selected.length === 0
                 ? 'Select notes to fill the bottle'
                 : `${selected.length} note${selected.length > 1 ? 's' : ''} selected`}

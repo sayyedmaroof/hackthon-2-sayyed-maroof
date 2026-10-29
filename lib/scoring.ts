@@ -68,7 +68,7 @@ export function notesFromIds(noteIds: string[]): FragranceNote[] {
   return noteIds.map((id) => NOTES_BY_ID[id]).filter((note): note is FragranceNote => Boolean(note))
 }
 
-export const EMPTY_BLEND_COLOR = '#E9DCC8'
+export const EMPTY_BLEND_COLOR = '#D8E6F2'
 
 export function computeProfile(noteIds: string[]): ScentProfile | null {
   const notes = notesFromIds(noteIds)

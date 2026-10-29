@@ -55,6 +55,8 @@ export type BottleType = 'classic' | 'designer'
 export type AtomizerMaterial = 'plastic' | 'metal'
 export type AtomizerType = 'normal' | 'pressurized'
 export type LabelStyle = 'ivory' | 'noir' | 'copper'
+/** Formulation vehicle the fragrance oils are carried in. */
+export type Base = 'alcohol' | 'water'
 
 export interface BottleOptions {
   size: BottleSize
@@ -63,6 +65,7 @@ export interface BottleOptions {
   atomizerMaterial: AtomizerMaterial
   atomizerType: AtomizerType
   labelStyle: LabelStyle
+  base: Base
 }
 
 export interface Blend {
