@@ -62,7 +62,10 @@ function markSeen(storageKey: string) {
   }
 }
 
-function findTargetRect(target?: string): Rect | null {
+function findTargetRect(
+  target?: string,
+  cardHeight = 320,
+): Rect | null {
   if (!target) return null
   const el = document.querySelector<HTMLElement>(
     `[data-walkthrough="${target}"]`,
@@ -71,12 +74,18 @@ function findTargetRect(target?: string): Rect | null {
   const r = el.getBoundingClientRect()
   // Hidden elements (e.g. desktop-only aside) have no box — fall back to center.
   if (r.width === 0 && r.height === 0) return null
+  const roomBelow = window.innerHeight - r.bottom
+  const roomAbove = r.top
+  const fitsBelow = roomBelow >= cardHeight + GAP + SIDES
+  const fitsAbove = roomAbove >= cardHeight + GAP + SIDES
   return {
     top: r.top,
     left: r.left,
     width: r.width,
     height: r.height,
-    below: window.innerHeight - r.bottom > GAP + 200,
+    // Prefer below, then above; if neither fits, take the roomier side and
+    // let the vertical clamp keep the card on screen.
+    below: fitsBelow ? true : !fitsAbove ? roomBelow >= roomAbove : false,
   }
 }
 
@@ -97,6 +106,8 @@ export function Walkthrough({
   const [open, setOpen] = useState(false)
   const [index, setIndex] = useState(0)
   const [rect, setRect] = useState<Rect | null>(null)
+  const [cardHeight, setCardHeight] = useState(320) // pre-measure estimate
+  const cardRef = useRef<HTMLDivElement>(null)
   const nextRef = useRef<HTMLButtonElement>(null)
 
   const mounted = useRef(false)
@@ -137,8 +148,12 @@ export function Walkthrough({
   }, [open, index, step?.target])
 
   const measure = useCallback(() => {
-    setRect(findTargetRect(step?.target))
-  }, [step?.target])
+    // Track the card's real height so placement accounts for the current step.
+    if (cardRef.current && cardRef.current.offsetHeight > 0) {
+      setCardHeight(cardRef.current.offsetHeight)
+    }
+    setRect(findTargetRect(step?.target, cardHeight))
+  }, [step?.target, cardHeight])
 
   // Initial measure once the card mounts and layout settles
   useLayoutEffect(() => {
@@ -184,18 +199,29 @@ export function Walkthrough({
 
   if (steps.length === 0) return null
 
-  // SSR guard — `open` is false on the server, but widths are still computed below.
+  // SSR guard — `open` is false on the server, but sizes are still computed below.
   const vw = typeof window === 'undefined' ? 1024 : window.innerWidth
+  const vh = typeof window === 'undefined' ? 800 : window.innerHeight
   const cardWidth = Math.min(CARD_MAX, vw - SIDES * 2)
   const centered = !rect
   const cardX = centered
-    ? vw / 2
+    ? (vw - cardWidth) / 2
     : clampCardX(rect.left + rect.width / 2, cardWidth)
-  const cardY = centered
-    ? '50%'
-    : rect.below
-      ? rect.top + rect.height + GAP
-      : rect.top - GAP
+
+  // Vertical placement — clamp the card fully inside the viewport so the tour
+  // can never drift off-screen, even beside a tall card or an edge target.
+  let cardTop: number
+  if (centered) {
+    cardTop = Math.max(SIDES, (vh - cardHeight) / 2)
+  } else if (rect.below) {
+    cardTop = Math.max(
+      SIDES,
+      Math.min(rect.top + rect.height + GAP, vh - SIDES - cardHeight),
+    )
+  } else {
+    // Card sits above the target: cardTop is the card's top edge directly.
+    cardTop = Math.max(rect.top - GAP - cardHeight, SIDES)
+  }
 
   return (
     <>
@@ -229,6 +255,7 @@ export function Walkthrough({
         {open && (
           <motion.div
             key={index}
+            ref={cardRef}
             role="dialog"
             aria-label={`Walkthrough step ${index + 1} of ${steps.length}`}
             initial={{ opacity: 0, y: centered ? 0 : rect.below ? -8 : 8 }}
@@ -236,25 +263,11 @@ export function Walkthrough({
             exit={{ opacity: 0, y: centered ? 0 : rect.below ? 8 : -8 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="fixed z-[70] rounded-3xl border border-[#CCDFF0] bg-[#FDFEFF] p-5 shadow-[0_24px_60px_rgba(5,19,52,0.25)]"
-            style={
-              centered
-                ? {
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: cardWidth,
-                  }
-                : {
-                    left: cardX,
-                    width: cardWidth,
-                    ...(rect.below
-                      ? { top: cardY }
-                      : {
-                          top: cardY,
-                          transform: 'translateY(-100%)',
-                        }),
-                  }
-            }
+            style={{
+              top: cardTop,
+              left: cardX,
+              width: cardWidth,
+            }}
           >
             <div className="flex items-start justify-between gap-3">
               <p className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-[#1E63C8]">

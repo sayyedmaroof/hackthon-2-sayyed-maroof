@@ -943,14 +943,14 @@ function BuilderContent() {
                           className="h-full rounded-full"
                           style={{ backgroundColor: liquidColor }}
                           animate={{
-                            width: `${Math.min(100, (draft.noteIds.length / 6) * 100)}%`,
+                            width: `${Math.min(100, draft.noteIds.length * 12.5)}%`,
                           }}
                           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
                         />
                       </div>
                     </div>
                     <span className="text-[0.6rem] text-[#5C728F]">
-                      {draft.noteIds.length}/6
+                      {draft.noteIds.length}
                     </span>
                   </div>
                 )}
