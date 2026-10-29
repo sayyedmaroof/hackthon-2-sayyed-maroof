@@ -50,7 +50,12 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: `Cart is limited to ${MAX_ITEMS} blends.` }, { status: 400 })
   }
 
-  const items = rawItems.map((item) => parseCartItem(item)).filter((i): i is CartItem => i !== null)
+  const items = rawItems
+    .map((item) => parseCartItem(item))
+    .filter((i): i is CartItem => i !== null)
+    // Duplicate ids in the payload (e.g. raced syncs) would violate the
+    // (user_id, item_id) primary key; keep the first occurrence.
+    .filter((item, index, all) => all.findIndex((i) => i.id === item.id) === index)
 
   await db.transaction(async (tx) => {
     await tx.delete(cartItems).where(eq(cartItems.userId, user.id))

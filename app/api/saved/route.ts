@@ -44,7 +44,13 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: `Blends are limited to ${MAX_BLENDS}.` }, { status: 400 })
   }
 
-  const blends = rawBlends.map((blend) => parseBlend(blend)).filter((b): b is Blend => b !== null)
+  const blends = rawBlends
+    .map((blend) => parseBlend(blend))
+    .filter((b): b is Blend => b !== null)
+    // The payload can carry the same blend twice (double-tap save while
+    // syncing). Keep the first occurrence: insert would otherwise trip
+    // saved_blends_user_id_blend_id_pk and fail the whole sync.
+    .filter((blend, index, all) => all.findIndex((b) => b.id === blend.id) === index)
 
   await db.transaction(async (tx) => {
     await tx.delete(savedBlends).where(eq(savedBlends.userId, user.id))

@@ -1,4 +1,5 @@
 import { FAMILY_LABELS, LAYERS, NOTES, NOTES_BY_ID, OCCASION_LABELS } from './fragrance-data'
+import { resolveAvoidEntries } from './ai/avoid'
 import { computeProfile, longevityHours, notesFromIds } from './scoring'
 import { validateAdd, validateBlend } from './validation'
 import type {
@@ -69,11 +70,15 @@ export function buildTarget(input: ConciergeInput): Target {
   t.avoidNotes.push(...avoidNotes)
   t.avoidFamilies.push(...avoidFamilies)
 
+  // Human-readable entries ("vanilla", "Smoked Oud", "woody") resolve to real
+  // catalog IDs / families; quantifier hints keep their special handling.
+  const resolved = resolveAvoidEntries(input.avoid)
+  t.avoidNotes.push(...resolved.noteIds)
+  t.avoidFamilies.push(...resolved.families)
   for (const avoided of input.avoid) {
-    if (avoided in FAMILY_KEYWORDS) t.avoidFamilies.push(avoided as Family)
-    else if (NOTES_BY_ID[avoided]) t.avoidNotes.push(avoided)
-    else if (avoided === 'sweet') t.sweetness = 1.5
-    else if (avoided === 'heavy') t.intensity = Math.min(t.intensity, 4)
+    const normalized = avoided.trim().toLowerCase()
+    if (normalized === 'sweet') t.sweetness = 1.5
+    else if (normalized === 'heavy') t.intensity = Math.min(t.intensity, 4)
   }
 
   const positiveText = text.replace(/(?:no|avoid|without|not|hate|dislike)\s+(?:too\s+)?[a-z-]+/g, '')
@@ -145,16 +150,13 @@ function scoreNote(note: FragranceNote, target: Target, tier: RecommendationTier
 
 function pickBlend(target: Target, tier: RecommendationTier, used: Set<string>) {
   const chosen: string[] = []
-  let relaxed = false
+  // Explicit exclusions are absolute: if a layer has no candidates once
+  // exclusions are honored, we skip that layer rather than relaxing the rule.
+  const respectsExclusions = (n: FragranceNote) =>
+    !target.avoidNotes.includes(n.id) && !target.avoidFamilies.includes(n.family)
 
   for (const layer of LAYERS) {
-    const allowed = (n: FragranceNote) =>
-      n.layer === layer && !target.avoidNotes.includes(n.id) && !target.avoidFamilies.includes(n.family)
-    let candidates = NOTES.filter(allowed)
-    if (candidates.length === 0) {
-      relaxed = true
-      candidates = NOTES.filter((n) => n.layer === layer && !target.avoidNotes.includes(n.id))
-    }
+    const candidates = NOTES.filter((n) => n.layer === layer && respectsExclusions(n))
     const ranked = candidates
       .map((note) => ({ note, score: scoreNote(note, target, tier, used) }))
       .sort((a, b) => b.score - a.score)
@@ -176,7 +178,7 @@ function pickBlend(target: Target, tier: RecommendationTier, used: Set<string>) 
     chosen.splice(chosen.indexOf(issue.noteB.id), 1)
     validation = validateBlend(chosen)
   }
-  return { noteIds: chosen, relaxed }
+  return { noteIds: chosen }
 }
 
 const NAMES: Record<Family, string[]> = {
@@ -222,10 +224,23 @@ export function recommendBlends(input: ConciergeInput): ConciergeRecommendation[
   const seed = (input.freeText + input.families.join('')).length
 
   return (['Safe', 'Balanced', 'Bold'] as RecommendationTier[]).map((tier, index) => {
-    const { noteIds, relaxed } = pickBlend(target, tier, used)
+    const { noteIds } = pickBlend(target, tier, used)
     noteIds.forEach((id) => used.add(id))
     const profile = computeProfile(noteIds)
-    if (!profile) throw new Error('Could not compose a blend from these preferences.')
+    if (!profile) {
+      // Practically unreachable: the catalog always offers valid materials,
+      // but keep guests alive with an honest placeholder if they exclude
+      // virtually everything.
+      return {
+        tier,
+        name: NAMES.woody[0],
+        noteIds: [],
+        family: 'fresh' as Family,
+        summary: TIER_SUMMARY[tier],
+        explanation: 'Your exclusions left too few materials to compose a complete blend. Try lifting one or two.',
+        profile: null as unknown as ScentProfile,
+      }
+    }
     const names = NAMES[profile.family]
     return {
       tier,
@@ -233,7 +248,7 @@ export function recommendBlends(input: ConciergeInput): ConciergeRecommendation[
       noteIds,
       family: profile.family,
       summary: TIER_SUMMARY[tier],
-      explanation: explain(noteIds, profile, target, relaxed),
+      explanation: explain(noteIds, profile, target, false),
       profile,
     }
   })

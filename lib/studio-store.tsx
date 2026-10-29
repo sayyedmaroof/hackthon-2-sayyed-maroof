@@ -5,9 +5,24 @@ import { useAuth } from './auth-store'
 import { DEFAULT_BOTTLE } from './fragrance-data'
 import { createId, sanitizeName, storage } from './storage'
 import { sanitizeNoteIds, validateAdd, type AddResult } from './validation'
-import type { Blend, BottleOptions, CartItem, Layer, Order } from './types'
+import { simulatePlan, type PlanAction } from './ai/plan'
+import type { Blend, BottleOptions, CartItem, Concentration, Layer, Order } from './types'
 
 const MAX_QTY = 10
+
+/** Full composition state so undo restores notes AND bottle settings. */
+export interface CompositionSnapshot {
+  noteIds: string[]
+  concentration: Concentration
+}
+
+export interface ApplyPlanResult {
+  ok: boolean
+  message?: string
+  warnings?: { id: string; message: string; suggestion?: string }[]
+  snapshot?: CompositionSnapshot
+  labels?: string[]
+}
 
 function emptyDraft(): Blend {
   return {
@@ -30,6 +45,15 @@ interface StudioContextValue {
   addNote: (noteId: string, layer?: Layer) => AddResult
   removeNote: (noteId: string) => void
   replaceNote: (oldId: string | undefined, newId: string) => AddResult
+  /**
+   * Atomically apply a validated assistant change set. The full plan is
+   * simulated first; the draft is only touched when every step is valid.
+   */
+  applyAssistantPlan: (actions: readonly PlanAction[]) => ApplyPlanResult
+  /** Restore a previous composition (notes + concentration) for undo. */
+  restoreComposition: (snapshot: CompositionSnapshot) => boolean
+  /** Capture the current composition for undo. */
+  captureComposition: () => CompositionSnapshot
   clearDraft: () => void
   loadBlend: (input: { name: string; noteIds: string[]; bottle?: BottleOptions; presetId?: string }) => void
   openSaved: (id: string) => boolean
@@ -178,6 +202,47 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
     [draft.noteIds],
   )
 
+  const captureComposition = useCallback<StudioContextValue['captureComposition']>(() => {
+    return { noteIds: [...draft.noteIds], concentration: draft.bottle.concentration }
+  }, [draft.noteIds, draft.bottle.concentration])
+
+  const applyAssistantPlan = useCallback<StudioContextValue['applyAssistantPlan']>(
+    (actions) => {
+      // 1. Simulate the complete change set against a copy of the blend.
+      const sim = simulatePlan(draft.noteIds, draft.bottle.concentration, actions)
+      // 2. Commit only if every step is valid and no clash rules fire.
+      if (!sim.ok) {
+        return {
+          ok: false,
+          message: sim.steps.find((s) => !s.ok)?.message ?? 'That change does not fit the current blend.',
+        }
+      }
+      if (sim.noChanges) {
+        return { ok: true, snapshot: { noteIds: [...draft.noteIds], concentration: draft.bottle.concentration }, labels: [] }
+      }
+      // 3. Single commit: one setDraft call covers notes + concentration.
+      const snapshot: CompositionSnapshot = { noteIds: [...draft.noteIds], concentration: draft.bottle.concentration }
+      setDraft((d) =>
+        touch({
+          ...d,
+          noteIds: sim.finalIds,
+          bottle: { ...d.bottle, concentration: sim.finalConcentration },
+        }),
+      )
+      return { ok: true, snapshot, warnings: sim.warnings, labels: sim.steps.filter((s) => s.ok).map((s) => (s as { label: string }).label) }
+    },
+    [draft.noteIds, draft.bottle.concentration],
+  )
+
+  const restoreComposition = useCallback<StudioContextValue['restoreComposition']>((snapshot) => {
+    const ids = sanitizeNoteIds(snapshot.noteIds)
+    const concentration: Concentration =
+      snapshot.concentration === 'edt' || snapshot.concentration === 'parfum' ? snapshot.concentration : 'edp'
+    if (ids.length === 0 && snapshot.noteIds.length > 0) return false
+    setDraft((d) => touch({ ...d, noteIds: ids, bottle: { ...d.bottle, concentration } }))
+    return true
+  }, [])
+
   const clearDraft = useCallback(() => {
     setDraft({ ...emptyDraft(), id: createId('blend'), updatedAt: Date.now() })
   }, [])
@@ -299,6 +364,9 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
       addNote,
       removeNote,
       replaceNote,
+      applyAssistantPlan,
+      restoreComposition,
+      captureComposition,
       clearDraft,
       loadBlend,
       openSaved,
@@ -314,7 +382,7 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
       clearCart,
       recordOrder,
     }),
-    [hydrated, draft, cart, saved, orders, editingCartItemId, addNote, removeNote, replaceNote, clearDraft, loadBlend, openSaved, setName, setBottle, saveDraft, deleteSaved, addToCart, editCartItem, cancelEditCartItem, setQuantity, removeFromCart, clearCart, recordOrder],
+    [hydrated, draft, cart, saved, orders, editingCartItemId, addNote, removeNote, replaceNote, applyAssistantPlan, restoreComposition, captureComposition, clearDraft, loadBlend, openSaved, setName, setBottle, saveDraft, deleteSaved, addToCart, editCartItem, cancelEditCartItem, setQuantity, removeFromCart, clearCart, recordOrder],
   )
 
   return <StudioContext.Provider value={value}>{children}</StudioContext.Provider>

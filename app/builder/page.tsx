@@ -23,7 +23,7 @@ import { useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { GlassBottle } from '@/components/glass-bottle'
 import { NoteCard } from '@/components/note-card'
-import { ScentAdvisor } from '@/components/scent-advisor'
+import { ScentAdvisor, ScentAdvisorSessionProvider } from '@/components/scent-advisor'
 import { FamilyMix, EvolutionTimeline, ProfileBars } from '@/components/scent-profile'
 import { Walkthrough, type WalkthroughStep } from '@/components/walkthrough'
 import {
@@ -248,6 +248,7 @@ function BuilderContent() {
       toast.success(isEditing ? 'Cart item updated.' : 'Blend added to cart.')
     })
   }
+
 
   const handleSave = () => {
     if (draft.noteIds.length === 0) {
@@ -789,20 +790,10 @@ function BuilderContent() {
               </AnimatePresence>
             </div>
 
-            {/* ── Scent Advisor (mobile/tablet — desktop renders it in the sticky aside) ── */}
+            {/* ── Scent Advisor (mobile/tablet — the same shared session renders
+                in the desktop sticky aside; state follows the viewport) ── */}
             <div className="lg:hidden">
-              <ScentAdvisor
-                noteIds={draft.noteIds}
-                onAddNote={addNote}
-                onRemoveNote={removeNote}
-                onReplaceNote={(oldId, newId) => {
-                  removeNote(oldId)
-                  addNote(newId)
-                }}
-                onSetConcentration={value =>
-                  setBottle({ concentration: value })
-                }
-              />
+              <ScentAdvisor />
             </div>
 
             {/* ── Price breakdown ────────────────────────────────────── */}
@@ -1131,19 +1122,8 @@ function BuilderContent() {
                   )}
                 </AnimatePresence>
 
-              {/* Scent Advisor */}
-              <ScentAdvisor
-                noteIds={draft.noteIds}
-                onAddNote={addNote}
-                onRemoveNote={removeNote}
-                onReplaceNote={(oldId, newId) => {
-                  removeNote(oldId)
-                  addNote(newId)
-                }}
-                onSetConcentration={value =>
-                  setBottle({ concentration: value })
-                }
-              />
+              {/* Scent Advisor — same session instance as the mobile panel */}
+              <ScentAdvisor />
             </div>
           </aside>
 
@@ -1344,7 +1324,10 @@ export default function BuilderPage() {
         </div>
       }
     >
-      <BuilderContent />
+      {/* One advisor session shared by every responsive presentation */}
+      <ScentAdvisorSessionProvider>
+        <BuilderContent />
+      </ScentAdvisorSessionProvider>
     </Suspense>
   )
 }
