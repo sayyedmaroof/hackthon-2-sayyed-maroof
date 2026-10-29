@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { SpotlightCard } from '@/components/ui/spotlight-card'
 import { FAMILY_LABELS } from '@/lib/fragrance-data'
 import { calculatePrice, formatPrice } from '@/lib/pricing'
 import type { FragrancePreset } from '@/lib/types'
@@ -21,10 +22,11 @@ export function PresetCard({
       className={cn(
         'group flex flex-col overflow-hidden rounded-2xl border transition-all duration-300 hover:-translate-y-1 hover:shadow-xl',
         dark
-          ? 'border-[#FAF7F0]/8 bg-[#2C1A24] text-[#FAF7F0]'
-          : 'border-[#E5D8C4] bg-[#FFFEFC] text-[#30241F]',
+          ? 'border-[#F5F9FD]/8 bg-[#0B1B44] text-[#F5F9FD]'
+          : 'border-[#CCDFF0] bg-[#FDFEFF] text-[#0E1B33]',
       )}
     >
+      <SpotlightCard className="relative z-10 flex flex-1 flex-col rounded-2xl" spotlightColor="rgba(87, 184, 242, 0.14)">
       {/* Image */}
       <Link href={`/blend/${preset.id}`} className="relative block aspect-[4/5] overflow-hidden">
         <Image
@@ -40,11 +42,11 @@ export function PresetCard({
           aria-hidden="true"
           className={cn(
             'absolute inset-0 bg-gradient-to-t to-transparent',
-            dark ? 'from-[#2C1A24]/70' : 'from-[#24101F]/40',
+            dark ? 'from-[#0B1B44]/70' : 'from-[#051334]/40',
           )}
         />
         {preset.popular && (
-          <span className="absolute left-3 top-3 rounded-full bg-[#B88A3B]/90 px-2.5 py-1 text-[0.6rem] font-medium uppercase tracking-[0.2em] text-[#FAF7F0]">
+          <span className="absolute left-3 top-3 rounded-full bg-[#1E63C8]/90 px-2.5 py-1 text-[0.6rem] font-medium uppercase tracking-[0.2em] text-[#F5F9FD]">
             Popular
           </span>
         )}
@@ -59,11 +61,11 @@ export function PresetCard({
                 {preset.name}
               </Link>
             </h3>
-            <p className={cn('mt-0.5 text-sm', dark ? 'text-[#FAF7F0]/60' : 'text-[#8B7B72]')}>
+            <p className={cn('mt-0.5 text-sm', dark ? 'text-[#F5F9FD]/60' : 'text-[#5C728F]')}>
               {preset.tagline}
             </p>
           </div>
-          <p className="shrink-0 font-serif text-lg text-[#B88A3B]">{formatPrice(price)}</p>
+          <p className="shrink-0 font-serif text-lg text-[#1E63C8]">{formatPrice(price)}</p>
         </div>
 
         {/* Family pills */}
@@ -74,8 +76,8 @@ export function PresetCard({
               className={cn(
                 'rounded-full border px-2.5 py-0.5 text-xs',
                 dark
-                  ? 'border-[#FAF7F0]/12 text-[#FAF7F0]/55'
-                  : 'border-[#E5D8C4] text-[#8B7B72]',
+                  ? 'border-[#F5F9FD]/12 text-[#F5F9FD]/55'
+                  : 'border-[#CCDFF0] text-[#5C728F]',
               )}
             >
               {FAMILY_LABELS[family]}
@@ -90,8 +92,8 @@ export function PresetCard({
             className={cn(
               'flex-1 rounded-full px-4 py-2.5 text-center text-sm font-medium transition-colors',
               dark
-                ? 'bg-[#B88A3B] text-[#FAF7F0] hover:bg-[#D4B16A]'
-                : 'bg-[#351329] text-[#FAF7F0] hover:bg-[#B88A3B]',
+                ? 'bg-[#1E63C8] text-[#F5F9FD] hover:bg-[#57B8F2]'
+                : 'bg-[#1E63C8] text-[#F5F9FD] hover:bg-[#154FB8]',
             )}
           >
             Customize
@@ -101,14 +103,15 @@ export function PresetCard({
             className={cn(
               'rounded-full border px-4 py-2.5 text-sm transition-colors',
               dark
-                ? 'border-[#FAF7F0]/12 text-[#FAF7F0]/70 hover:bg-[#FAF7F0]/8'
-                : 'border-[#E5D8C4] text-[#30241F] hover:border-[#B88A3B]/40 hover:bg-[#FAF7F0]',
+                ? 'border-[#F5F9FD]/12 text-[#F5F9FD]/70 hover:bg-[#F5F9FD]/8'
+                : 'border-[#CCDFF0] text-[#0E1B33] hover:border-[#1E63C8]/40 hover:bg-[#F5F9FD]',
             )}
           >
             Details
           </Link>
         </div>
       </div>
+      </SpotlightCard>
     </article>
   )
 }

@@ -2,6 +2,7 @@ import { notesFromIds } from './scoring'
 import type {
   AtomizerMaterial,
   AtomizerType,
+  Base,
   BottleOptions,
   BottleSize,
   BottleType,
@@ -48,6 +49,11 @@ export const LABEL_OPTIONS: { value: LabelStyle; label: string; swatch: string }
   { value: 'copper', label: 'Copper', swatch: '#C68149' },
 ]
 
+export const BASE_OPTIONS: { value: Base; label: string; detail: string; price: number }[] = [
+  { value: 'alcohol', label: 'Alcohol-based', detail: 'Classic spray · quick lift', price: 0 },
+  { value: 'water', label: 'Water-based', detail: 'Alcohol-free · gentle on skin', price: 5 },
+]
+
 export const SHIPPING_FLAT = 0
 
 const round2 = (value: number) => Math.round(value * 100) / 100
@@ -61,14 +67,16 @@ export function calculatePrice(noteIds: string[], bottle: BottleOptions): PriceB
   const bottleType = BOTTLE_TYPE_OPTIONS.find((o) => o.value === bottle.bottleType) ?? BOTTLE_TYPE_OPTIONS[0]
   const material = ATOMIZER_MATERIAL_OPTIONS.find((o) => o.value === bottle.atomizerMaterial) ?? ATOMIZER_MATERIAL_OPTIONS[0]
   const atomizer = ATOMIZER_TYPE_OPTIONS.find((o) => o.value === bottle.atomizerType) ?? ATOMIZER_TYPE_OPTIONS[0]
+  const base = BASE_OPTIONS.find((o) => o.value === bottle.base) ?? BASE_OPTIONS[0]
 
   const adjustment = round2(notesSubtotal * (size.multiplier * concentration.multiplier - 1))
+  const formulationCost = base.price
   const bottleCost = bottleType.price + material.price + atomizer.price
-  const unitTotal = notes.length === 0 ? 0 : round2(notesSubtotal + adjustment + bottleCost)
+  const unitTotal = notes.length === 0 ? 0 : round2(notesSubtotal + adjustment + bottleCost + formulationCost)
 
   return {
     notesSubtotal: round2(notesSubtotal),
-    bottleCost,
+    bottleCost: round2(bottleCost + formulationCost),
     adjustment,
     unitTotal,
     lines: [
@@ -77,6 +85,7 @@ export function calculatePrice(noteIds: string[], bottle: BottleOptions): PriceB
       { label: `${bottleType.label} bottle`, amount: bottleType.price },
       { label: material.label + ' atomizer', amount: material.price },
       { label: atomizer.label, amount: atomizer.price },
+      { label: base.label + ' base', amount: formulationCost },
     ],
   }
 }
@@ -88,5 +97,6 @@ export function formatPrice(value: number) {
 export function bottleSummary(bottle: BottleOptions) {
   const concentration = CONCENTRATION_OPTIONS.find((o) => o.value === bottle.concentration)?.label
   const type = BOTTLE_TYPE_OPTIONS.find((o) => o.value === bottle.bottleType)?.label
-  return `${bottle.size} ml · ${concentration} · ${type}`
+  const suffix = bottle.base === 'water' ? ' · alcohol-free' : ''
+  return `${bottle.size} ml · ${concentration} · ${type}${suffix}`
 }

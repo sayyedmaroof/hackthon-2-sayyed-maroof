@@ -8,23 +8,21 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-cormorant), ui-serif, Georgia, serif;
 
-  /* Brand palette — ScentBuild Studio */
-  --color-plum:       #351329;
-  --color-plum-dark:  #24101F;
-  --color-gold:       #B88A3B;
-  --color-gold-light: #D4B16A;
-  --color-ivory:      #FAF7F0;
-  --color-cream:      #F1E8D9;
-  --color-espresso:   #30241F;
-  --color-taupe:      #8B7B72;
-  --color-white:      #FFFEFC;
-
-  /* Legacy aliases — keep existing page styles working */
-  --color-walnut:  #4A2E28;
-  --color-ember:   #B88A3B;
-  --color-copper:  #D4B16A;
-  --color-sand:    #F1E8D9;
-  --color-paper:   #FFFEFC;
+  /*
+   * Brand palette — ScentBuild Studio (sapphire & azure)
+   * Derived from the new gem-bottle logo.
+   */
+  --color-sapphire:      #0A1A52; /* deep logo navy — primary */
+  --color-sapphire-deep: #051334; /* darkest navy — dark sections */
+  --color-sapphire-mid:  #10306B; /* mid navy — gradients */
+  --color-azure:         #1E63C8; /* azure accent — CTAs, highlights */
+  --color-azure-light:   #57B8F2; /* light azure — accents on dark */
+  --color-ice:           #F5F9FD; /* ice background */
+  --color-frost:         #E4EEF8; /* frost surface */
+  --color-ink:           #0E1B33; /* navy text */
+  --color-mist:          #5C728F; /* muted blue-gray text */
+  --color-white:         #FDFEFF; /* pearl white */
+  --color-pearl:         #FDFEFF;
 
   /* Semantic aliases */
   --color-ring: var(--ring);
@@ -57,24 +55,24 @@
 
 :root {
   color-scheme: light;
-  --background:           #FAF7F0;
-  --foreground:           #30241F;
-  --card:                 #FFFEFC;
-  --card-foreground:      #30241F;
-  --popover:              #FFFEFC;
-  --popover-foreground:   #30241F;
-  --primary:              #351329;
-  --primary-foreground:   #FAF7F0;
-  --secondary:            #F1E8D9;
-  --secondary-foreground: #30241F;
-  --muted:                #EDE0CC;
-  --muted-foreground:     #8B7B72;
-  --accent:               #B88A3B;
-  --accent-foreground:    #FAF7F0;
+  --background:           #F5F9FD;
+  --foreground:           #0E1B33;
+  --card:                 #FDFEFF;
+  --card-foreground:      #0E1B33;
+  --popover:              #FDFEFF;
+  --popover-foreground:   #0E1B33;
+  --primary:              #0A1A52;
+  --primary-foreground:   #F5F9FD;
+  --secondary:            #E4EEF8;
+  --secondary-foreground: #0E1B33;
+  --muted:                #D3E4F5;
+  --muted-foreground:     #5C728F;
+  --accent:               #1E63C8;
+  --accent-foreground:    #F5F9FD;
   --destructive:          #a63d2f;
-  --border:               #E5D8C4;
-  --input:                #E5D8C4;
-  --ring:                 #B88A3B;
+  --border:               #CCDFF0;
+  --input:                #CCDFF0;
+  --ring:                 #1E63C8;
   --radius:               0.75rem;
 }
 
@@ -97,7 +95,7 @@
 
 /* Eyebrow label utility */
 .eyebrow {
-  @apply text-xs font-medium uppercase tracking-[0.35em] text-gold;
+  @apply text-xs font-medium uppercase tracking-[0.35em] text-azure;
 }
 
 /* Premium section spacing */
@@ -107,8 +105,62 @@
 
 /* Elegant focus ring */
 :focus-visible {
-  outline: 2px solid #B88A3B;
+  outline: 2px solid #1E63C8;
   outline-offset: 3px;
+}
+
+/* Azure text selection */
+::selection {
+  background: rgba(30, 99, 200, 0.16);
+  color: inherit;
+}
+
+/* Light sweep that streaks across a filled button on hover */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn-shine::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -65%;
+  width: 45%;
+  z-index: 1;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  transform: skewX(-18deg);
+  transition: left 0.65s ease;
+  pointer-events: none;
+}
+.btn-shine:hover::after {
+  left: 115%;
+}
+
+/* Tactile press feedback for selectable tiles */
+.press {
+  transition: transform 0.15s ease;
+}
+.press:active {
+  transform: scale(0.97);
+}
+
+/* Barely-there film grain over the whole page for extra depth */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.7'/></svg>");
+  background-size: 160px 160px;
 }
 
 @media (prefers-reduced-motion: reduce) {

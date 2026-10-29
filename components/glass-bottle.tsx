@@ -33,8 +33,8 @@ import { cn } from '@/lib/utils'
 // ─── Label palette ──────────────────────────────────────────────────────────
 
 const LABEL_PALETTE = {
-  ivory:  { bg: '#F8F3EB', bg2: '#EDE4D2', text: '#2A1608', rule: '#B88A3B', sub: '#8B6A3A' },
-  noir:   { bg: '#16100C', bg2: '#201610', text: '#F0EBE2', rule: '#D4B16A', sub: '#A08050' },
+  ivory:  { bg: '#F8F3EB', bg2: '#EDE4D2', text: '#2A1608', rule: '#1E63C8', sub: '#8B6A3A' },
+  noir:   { bg: '#16100C', bg2: '#201610', text: '#F0EBE2', rule: '#57B8F2', sub: '#A08050' },
   copper: { bg: '#C4922A', bg2: '#D4A840', text: '#1A0C04', rule: '#7A4A10', sub: '#5A3008' },
 }
 

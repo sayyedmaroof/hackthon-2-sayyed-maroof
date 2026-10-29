@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { LAYERS, LAYER_INFO, NOTES } from '@/lib/fragrance-data'
 import { fadeIn, fadeUp, staggerContainer } from '@/lib/motion'
+import { SpotlightCard } from '@/components/ui/spotlight-card'
 
 const LAYER_IMAGE = {
   top:    '/images/notes/citrus.png',
@@ -26,7 +27,7 @@ export function LayersExplainer() {
   return (
     <section
       aria-labelledby="layers-heading"
-      className="bg-[#30241F] py-20 text-[#FAF7F0] md:py-28"
+      className="bg-gradient-to-b from-[#E4EEF8] via-[#EFF6FD] to-[#F5F9FD] py-20 text-[#0E1B33] md:py-28"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
@@ -40,21 +41,21 @@ export function LayersExplainer() {
         >
           <motion.p
             variants={fadeUp}
-            className="text-xs font-medium uppercase tracking-[0.35em] text-[#D4B16A]"
+            className="text-xs font-medium uppercase tracking-[0.35em] text-[#1E63C8]"
           >
             The fragrance pyramid
           </motion.p>
           <motion.h2
             id="layers-heading"
             variants={fadeUp}
-            className="mt-4 font-serif text-4xl font-medium leading-tight sm:text-5xl"
+            className="mt-4 font-serif text-4xl font-medium leading-tight text-[#0A1A52] sm:text-5xl"
           >
             Three layers.{' '}
-            <em className="text-[#D4B16A]">One story</em> that unfolds on skin.
+            <em className="text-[#1E63C8]">One story</em> that unfolds on skin.
           </motion.h2>
           <motion.p
             variants={fadeUp}
-            className="mt-5 text-base leading-relaxed text-[#FAF7F0]/60"
+            className="mt-5 text-base leading-relaxed text-[#5C728F]"
           >
             Every great fragrance is a composition — a deliberate arc from the first impression to the lasting trail.
           </motion.p>
@@ -76,8 +77,9 @@ export function LayersExplainer() {
               <motion.article
                 key={layer}
                 variants={fadeUp}
-                className="group relative overflow-hidden rounded-2xl border border-[#FAF7F0]/8 bg-[#24101F]"
+                className="group relative overflow-hidden rounded-2xl border border-[#CCDFF0] bg-white/90 shadow-[0_12px_40px_rgba(16,55,120,0.08)] transition-shadow duration-500 hover:shadow-[0_18px_50px_rgba(16,55,120,0.14)]"
               >
+                <SpotlightCard className="relative z-10 rounded-2xl">
                 {/* Image */}
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <Image
@@ -90,13 +92,13 @@ export function LayersExplainer() {
                   {/* Overlay gradient */}
                   <div
                     aria-hidden="true"
-                    className="absolute inset-0 bg-gradient-to-t from-[#24101F]/70 via-transparent to-transparent"
+                    className="absolute inset-0 bg-gradient-to-t from-[#051334]/40 via-transparent to-transparent"
                   />
                   {/* Layer number badge */}
                   <div className="absolute right-4 top-4">
                     <span
-                      className="inline-block rounded-full px-3 py-1 text-[0.6rem] font-medium uppercase tracking-[0.25em]"
-                      style={{ backgroundColor: `${accent.color}22`, color: accent.color, border: `1px solid ${accent.color}44` }}
+                      className="inline-block rounded-full bg-white/85 px-3 py-1 text-[0.6rem] font-medium uppercase tracking-[0.25em] backdrop-blur-sm"
+                      style={{ color: accent.color, border: `1px solid ${accent.color}44` }}
                     >
                       {`0${index + 1}`}
                     </span>
@@ -113,14 +115,14 @@ export function LayersExplainer() {
                     {accent.label}
                   </p>
 
-                  <h3 className="mt-2 font-serif text-3xl leading-tight">
+                  <h3 className="mt-2 font-serif text-3xl leading-tight text-[#0A1A52]">
                     {LAYER_INFO[layer].label}
                   </h3>
-                  <p className="mt-1 text-xs uppercase tracking-[0.18em] text-[#FAF7F0]/35">
+                  <p className="mt-1 text-xs uppercase tracking-[0.18em] text-[#8FA3BC]">
                     {LAYER_INFO[layer].duration}
                   </p>
 
-                  <p className="mt-4 text-sm leading-relaxed text-[#FAF7F0]/60">
+                  <p className="mt-4 text-sm leading-relaxed text-[#5C728F]">
                     {LAYER_INFO[layer].description}
                   </p>
 
@@ -129,13 +131,14 @@ export function LayersExplainer() {
                     {examples.map((name) => (
                       <li
                         key={name}
-                        className="rounded-full border border-[#FAF7F0]/12 px-2.5 py-0.5 text-xs text-[#FAF7F0]/55"
+                        className="rounded-full border border-[#CCDFF0] bg-[#F5F9FD] px-2.5 py-0.5 text-xs text-[#5C728F]"
                       >
                         {name}
                       </li>
                     ))}
                   </ul>
                 </div>
+                </SpotlightCard>
               </motion.article>
             )
           })}
@@ -152,7 +155,7 @@ export function LayersExplainer() {
         >
           <Link
             href="/builder"
-            className="inline-flex items-center gap-2 rounded-full border border-[#B88A3B]/40 px-7 py-3 text-sm font-medium text-[#D4B16A] transition-colors hover:bg-[#B88A3B]/15"
+            className="btn-shine inline-flex items-center gap-2 rounded-full bg-[#1E63C8] px-7 py-3 text-sm font-medium text-[#F5F9FD] shadow-[0_10px_30px_rgba(30,99,200,0.25)] transition-colors hover:bg-[#154FB8]"
           >
             Start layering your blend
           </Link>

@@ -7,17 +7,18 @@ import Link from 'next/link'
 import { FAMILY_LABELS, PRESETS } from '@/lib/fragrance-data'
 import { calculatePrice, formatPrice } from '@/lib/pricing'
 import { fadeIn, fadeUp, staggerContainer } from '@/lib/motion'
+import { SpotlightCard } from '@/components/ui/spotlight-card'
 import { cn } from '@/lib/utils'
 
 // Subtle accent tones per preset for the card treatment
 const PRESET_ACCENTS: Record<string, { bg: string; border: string; badge: string }> = {
-  'royal-ember':  { bg: '#2C1010', border: '#8A3B1A/30', badge: '#C8762E' },
+  'royal-azure':  { bg: '#2C1010', border: '#8A3B1A/30', badge: '#C8762E' },
   'azure-wood':   { bg: '#0E1C26', border: '#2A4A5E/40', badge: '#6B9BAF' },
   'velvet-bloom': { bg: '#2A1020', border: '#7A2A4A/30', badge: '#D58A92' },
   'noir-spice':   { bg: '#1A0F0A', border: '#5A3020/30', badge: '#A55A2E' },
 }
 
-const DEFAULT_ACCENT = { bg: '#1A120D', border: '#5A3020/30', badge: '#B88A3B' }
+const DEFAULT_ACCENT = { bg: '#1A120D', border: '#5A3020/30', badge: '#1E63C8' }
 
 export function FeaturedBlends() {
   const featured = PRESETS.filter((p) => p.featured).slice(0, 4)
@@ -25,7 +26,7 @@ export function FeaturedBlends() {
   return (
     <section
       aria-labelledby="featured-heading"
-      className="bg-[#FAF7F0] py-20 md:py-28"
+      className="bg-[#F5F9FD] py-20 md:py-28"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
@@ -40,20 +41,20 @@ export function FeaturedBlends() {
           <div className="max-w-xl">
             <motion.p
               variants={fadeUp}
-              className="text-xs font-medium uppercase tracking-[0.35em] text-[#B88A3B]"
+              className="text-xs font-medium uppercase tracking-[0.35em] text-[#1E63C8]"
             >
               House compositions
             </motion.p>
             <motion.h2
               id="featured-heading"
               variants={fadeUp}
-              className="mt-4 font-serif text-4xl font-medium leading-tight sm:text-5xl text-[#30241F]"
+              className="mt-4 font-serif text-4xl font-medium leading-tight sm:text-5xl text-[#0E1B33]"
             >
               Start from a curated blend.
               <br />
-              <em className="text-[#B88A3B]">Make it your own.</em>
+              <em className="text-[#1E63C8]">Make it your own.</em>
             </motion.h2>
-            <motion.p variants={fadeUp} className="mt-4 text-[#8B7B72]">
+            <motion.p variants={fadeUp} className="mt-4 text-[#5C728F]">
               Each preset is fully editable. Load one into the builder and transform it.
             </motion.p>
           </div>
@@ -61,7 +62,7 @@ export function FeaturedBlends() {
           <motion.div variants={fadeIn}>
             <Link
               href="/explore"
-              className="inline-flex items-center gap-2 text-sm font-medium text-[#B88A3B] transition-colors hover:text-[#30241F]"
+              className="inline-flex items-center gap-2 text-sm font-medium text-[#1E63C8] transition-colors hover:text-[#0E1B33]"
             >
               Explore all blends <ArrowRight className="size-4" aria-hidden="true" />
             </Link>
@@ -85,8 +86,9 @@ export function FeaturedBlends() {
                 key={preset.id}
                 variants={fadeUp}
                 whileHover={{ y: -4, transition: { type: 'spring', stiffness: 180, damping: 28 } }}
-                className="group flex flex-col overflow-hidden rounded-2xl border border-[#E5D8C4] bg-[#FFFEFC] shadow-[0_2px_12px_rgba(48,36,31,0.06)] transition-shadow hover:shadow-[0_12px_36px_rgba(48,36,31,0.12)]"
+                className="group flex flex-col overflow-hidden rounded-2xl border border-[#CCDFF0] bg-[#FDFEFF] shadow-[0_2px_12px_rgba(14,27,51,0.06)] transition-shadow hover:shadow-[0_12px_36px_rgba(14,27,51,0.12)]"
               >
+                <SpotlightCard className="relative z-10 flex flex-1 flex-col rounded-2xl" spotlightColor="rgba(87, 184, 242, 0.14)">
                 {/* Image */}
                 <Link href={`/blend/${preset.id}`} className="relative block aspect-[4/5] overflow-hidden">
                   <Image
@@ -97,10 +99,10 @@ export function FeaturedBlends() {
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   {/* Dark overlay at bottom */}
-                  <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#24101F]/60 via-transparent to-transparent" />
+                  <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#051334]/60 via-transparent to-transparent" />
 
                   {preset.popular && (
-                    <span className="absolute left-3 top-3 rounded-full bg-[#B88A3B]/90 px-2.5 py-1 text-[0.6rem] font-medium uppercase tracking-[0.2em] text-[#FAF7F0]">
+                    <span className="absolute left-3 top-3 rounded-full bg-[#1E63C8]/90 px-2.5 py-1 text-[0.6rem] font-medium uppercase tracking-[0.2em] text-[#F5F9FD]">
                       Popular
                     </span>
                   )}
@@ -110,14 +112,14 @@ export function FeaturedBlends() {
                 <div className="flex flex-1 flex-col gap-3 p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <h3 className="font-serif text-2xl leading-tight text-[#30241F]">
+                      <h3 className="font-serif text-2xl leading-tight text-[#0E1B33]">
                         <Link href={`/blend/${preset.id}`} className="hover:underline underline-offset-2">
                           {preset.name}
                         </Link>
                       </h3>
-                      <p className="mt-0.5 text-sm text-[#8B7B72]">{preset.tagline}</p>
+                      <p className="mt-0.5 text-sm text-[#5C728F]">{preset.tagline}</p>
                     </div>
-                    <p className="shrink-0 font-serif text-lg text-[#B88A3B]">{formatPrice(price)}</p>
+                    <p className="shrink-0 font-serif text-lg text-[#1E63C8]">{formatPrice(price)}</p>
                   </div>
 
                   {/* Family pills */}
@@ -125,7 +127,7 @@ export function FeaturedBlends() {
                     {preset.families.map((family) => (
                       <li
                         key={family}
-                        className="rounded-full border border-[#E5D8C4] px-2.5 py-0.5 text-xs text-[#8B7B72]"
+                        className="rounded-full border border-[#CCDFF0] px-2.5 py-0.5 text-xs text-[#5C728F]"
                       >
                         {FAMILY_LABELS[family]}
                       </li>
@@ -136,18 +138,19 @@ export function FeaturedBlends() {
                   <div className="mt-auto flex gap-2 pt-2">
                     <Link
                       href={`/builder?preset=${preset.id}`}
-                      className="flex-1 rounded-full bg-[#351329] px-4 py-2.5 text-center text-sm font-medium text-[#FAF7F0] transition-colors hover:bg-[#B88A3B]"
+                      className="flex-1 rounded-full bg-[#1E63C8] px-4 py-2.5 text-center text-sm font-medium text-[#F5F9FD] btn-shine transition-colors hover:bg-[#154FB8]"
                     >
                       Customize
                     </Link>
                     <Link
                       href={`/blend/${preset.id}`}
-                      className="rounded-full border border-[#E5D8C4] px-4 py-2.5 text-sm text-[#30241F] transition-colors hover:border-[#B88A3B]/40 hover:bg-[#FAF7F0]"
+                      className="rounded-full border border-[#CCDFF0] px-4 py-2.5 text-sm text-[#0E1B33] transition-colors hover:border-[#1E63C8]/40 hover:bg-[#F5F9FD]"
                     >
                       Details
                     </Link>
                   </div>
                 </div>
+                </SpotlightCard>
               </motion.article>
             )
           })}

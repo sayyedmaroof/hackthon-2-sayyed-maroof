@@ -1,5 +1,5 @@
 import { DEFAULT_BOTTLE } from './fragrance-data'
-import { ATOMIZER_MATERIAL_OPTIONS, ATOMIZER_TYPE_OPTIONS, BOTTLE_TYPE_OPTIONS, CONCENTRATION_OPTIONS, LABEL_OPTIONS, SIZE_OPTIONS } from './pricing'
+import { ATOMIZER_MATERIAL_OPTIONS, ATOMIZER_TYPE_OPTIONS, BASE_OPTIONS, BOTTLE_TYPE_OPTIONS, CONCENTRATION_OPTIONS, LABEL_OPTIONS, SIZE_OPTIONS } from './pricing'
 import { sanitizeNoteIds } from './validation'
 import type { Blend, BottleOptions, CartItem, Order, OrderLine } from './types'
 
@@ -47,6 +47,7 @@ export function parseBottle(value: unknown): BottleOptions {
     atomizerMaterial: pickOption(v.atomizerMaterial, ATOMIZER_MATERIAL_OPTIONS, DEFAULT_BOTTLE.atomizerMaterial),
     atomizerType: pickOption(v.atomizerType, ATOMIZER_TYPE_OPTIONS, DEFAULT_BOTTLE.atomizerType),
     labelStyle: pickOption(v.labelStyle, LABEL_OPTIONS, DEFAULT_BOTTLE.labelStyle),
+    base: pickOption(v.base, BASE_OPTIONS, DEFAULT_BOTTLE.base),
   }
 }
 
@@ -75,6 +76,8 @@ function parseCartItem(value: unknown): CartItem | null {
   const quantity = typeof value.quantity === 'number' ? Math.min(10, Math.max(1, Math.floor(value.quantity))) : 1
   return { id: value.id, blend, quantity }
 }
+
+export { parseCartItem }
 
 function parseOrderLine(value: unknown): OrderLine | null {
   if (!isObject(value)) return null

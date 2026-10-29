@@ -8,7 +8,7 @@ const FAMILY_COLORS: Record<string, string> = {
   fresh:    '#8FB2B5',
   floral:   '#D58A92',
   woody:    '#8A5A3A',
-  amber:    '#B88A3B',
+  amber:    '#1E63C8',
   spicy:    '#A55A2E',
   gourmand: '#D9AE78',
 }
@@ -35,7 +35,7 @@ export function FamilyMix({ profile, dark }: { profile: Profile; dark?: boolean 
           />
         ))}
       </div>
-      <ul className={cn('mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs', dark ? 'text-ivory/70' : 'text-muted-foreground')}>
+      <ul className={cn('mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs', dark ? 'text-ice/70' : 'text-muted-foreground')}>
         {profile.familyMix.map((f) => (
           <li key={f.family} className="flex items-center gap-1.5">
             <span className="size-2 rounded-full" style={{ backgroundColor: FAMILY_COLORS[f.family] }} aria-hidden="true" />
@@ -55,15 +55,15 @@ export function ProfileBars({ profile, dark, compact }: { profile: Profile; dark
         const value = profile[key] as number
         return (
           <div key={key} className="grid grid-cols-[6.5rem_1fr_2rem] items-center gap-3 text-sm">
-            <dt className={dark ? 'text-ivory/75' : 'text-muted-foreground'}>{label}</dt>
+            <dt className={dark ? 'text-ice/75' : 'text-muted-foreground'}>{label}</dt>
             <dd className="contents">
-              <span className={cn('h-1.5 overflow-hidden rounded-full', dark ? 'bg-walnut' : 'bg-secondary')}>
+              <span className={cn('h-1.5 overflow-hidden rounded-full', dark ? 'bg-sapphire-mid' : 'bg-secondary')}>
                 <span
-                  className="block h-full rounded-full bg-copper transition-[width] duration-500"
+                  className="block h-full rounded-full bg-azure-light transition-[width] duration-500"
                   style={{ width: `${value * 10}%` }}
                 />
               </span>
-              <span className={cn('text-right tabular-nums', dark ? 'text-ivory' : 'text-foreground')}>{value.toFixed(1)}</span>
+              <span className={cn('text-right tabular-nums', dark ? 'text-ice' : 'text-foreground')}>{value.toFixed(1)}</span>
             </dd>
           </div>
         )
@@ -87,8 +87,8 @@ export function ProfileFacts({ profile, dark }: { profile: Profile; dark?: boole
     <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
       {facts.map((fact) => (
         <div key={fact.label}>
-          <dt className={cn('text-[0.65rem] uppercase tracking-[0.2em]', dark ? 'text-copper' : 'text-ember')}>{fact.label}</dt>
-          <dd className={cn('mt-0.5 text-sm', dark ? 'text-ivory' : 'text-foreground')}>{fact.value}</dd>
+          <dt className={cn('text-[0.65rem] uppercase tracking-[0.2em]', dark ? 'text-azure-light' : 'text-azure')}>{fact.label}</dt>
+          <dd className={cn('mt-0.5 text-sm', dark ? 'text-ice' : 'text-foreground')}>{fact.value}</dd>
         </div>
       ))}
     </dl>
