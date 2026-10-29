@@ -67,6 +67,11 @@ interface StudioContextValue {
   setQuantity: (itemId: string, quantity: number) => void
   removeFromCart: (itemId: string) => void
   clearCart: () => void
+  /**
+   * Remove only specific cart entries (used after verified Stripe payment) —
+   * anything added to the cart in the meantime stays.
+   */
+  removeCartItems: (ids: readonly string[]) => void
   recordOrder: (order: Order) => void
 }
 
@@ -296,20 +301,23 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
         noteIds: [...source.noteIds],
         bottle: { ...source.bottle },
       }
-      setEditingCartItemId((editingId) => {
-        if (editingId) {
-          // Editing an existing cart item: replace its blend, keep id + quantity.
-          setCart((items) => {
-            if (!items.some((item) => item.id === editingId)) return [...items, { id: editingId, blend: snapshot, quantity: 1 }]
-            return items.map((item) => (item.id === editingId ? { ...item, blend: snapshot } : item))
-          })
-        } else {
-          setCart((items) => [...items, { id: createId('item'), blend: snapshot, quantity: 1 }])
-        }
-        return null
-      })
+      if (editingCartItemId) {
+        const newItem = { id: createId('item'), blend: snapshot, quantity: 1 }
+        setCart((items) =>
+          items.some((item) => item.id === editingCartItemId)
+            ? items.map((item) =>
+                item.id === editingCartItemId ? { ...item, blend: snapshot } : item,
+              )
+            : [...items, newItem],
+        )
+        setEditingCartItemId(null)
+        return
+      }
+
+      const newItem = { id: createId('item'), blend: snapshot, quantity: 1 }
+      setCart((items) => [...items, newItem])
     },
-    [draft],
+    [draft, editingCartItemId],
   )
 
   // Load a cart item's blend into the builder so its notes/bottle can be edited;
@@ -348,6 +356,13 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
     setEditingCartItemId(null)
   }, [])
 
+  const removeCartItems = useCallback((ids: readonly string[]) => {
+    const remove = new Set(ids)
+    if (remove.size === 0) return
+    setCart((items) => items.filter((item) => !remove.has(item.id)))
+    setEditingCartItemId((current) => (current !== null && remove.has(current) ? null : current))
+  }, [])
+
   const recordOrder = useCallback((order: Order) => {
     setOrders((list) => [order, ...list.filter((o) => o.id !== order.id)])
   }, [])
@@ -380,9 +395,10 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
       setQuantity,
       removeFromCart,
       clearCart,
+      removeCartItems,
       recordOrder,
     }),
-    [hydrated, draft, cart, saved, orders, editingCartItemId, addNote, removeNote, replaceNote, applyAssistantPlan, restoreComposition, captureComposition, clearDraft, loadBlend, openSaved, setName, setBottle, saveDraft, deleteSaved, addToCart, editCartItem, cancelEditCartItem, setQuantity, removeFromCart, clearCart, recordOrder],
+    [hydrated, draft, cart, saved, orders, editingCartItemId, addNote, removeNote, replaceNote, applyAssistantPlan, restoreComposition, captureComposition, clearDraft, loadBlend, openSaved, setName, setBottle, saveDraft, deleteSaved, addToCart, editCartItem, cancelEditCartItem, setQuantity, removeFromCart, clearCart, removeCartItems, recordOrder],
   )
 
   return <StudioContext.Provider value={value}>{children}</StudioContext.Provider>

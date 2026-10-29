@@ -50,7 +50,9 @@ export async function POST(request: Request) {
   })
 
   const token = await createSession(userId)
-  const response = NextResponse.json({ user: { id: userId, email, name } })
+  const response = NextResponse.json({
+    user: { id: userId, email, name, createdAt: new Date().toISOString() },
+  })
   response.cookies.set(SESSION_COOKIE, token, cookieOptions())
   return response
 }

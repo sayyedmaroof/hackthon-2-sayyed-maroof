@@ -24,7 +24,7 @@ import { answerScentQuestion, type AnalystAnswer } from '@/lib/concierge'
 import { NOTES_BY_ID } from '@/lib/fragrance-data'
 import { resolveIntent, SUGGESTION_CHIPS } from '@/lib/assistant'
 import { simulatePlan, type PlanAction } from '@/lib/ai/plan'
-import type { ApiResponse, BuilderClientAction } from '@/lib/ai/schemas'
+import { MAX_ADVISOR_NOTES, type ApiResponse, type BuilderClientAction } from '@/lib/ai/schemas'
 import { cn } from '@/lib/utils'
 import { useStudio, type CompositionSnapshot } from '@/lib/studio-store'
 
@@ -141,6 +141,22 @@ export function ScentAdvisorSessionProvider({ children }: { children: ReactNode 
       lastUserMessage.current = text
 
       const { noteIds, concentration } = compositionRef.current
+
+      // Oversized blends cannot be analysed server-side (MAX_ADVISOR_NOTES).
+      // Answer locally with clear guidance instead of rendering a request
+      // rejection as if the advisor itself failed.
+      if (noteIds.length > MAX_ADVISOR_NOTES) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `a${Date.now()}`,
+            role: 'assistant',
+            text: `Your blend has ${noteIds.length} notes and I can analyse up to ${MAX_ADVISOR_NOTES}. Remove a note or two from the composition panel — then ask me again and I'll gladly refine it.`,
+          },
+        ])
+        setIsThinking(false)
+        return
+      }
 
       let okResponse: Extract<ApiResponse, { ok: true }> | null = null
       let apiErrorMessage: string | null = null

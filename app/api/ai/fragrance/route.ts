@@ -18,7 +18,7 @@ import { runBuilderAI } from '@/lib/ai/builder'
 import { runConciergeAI } from '@/lib/ai/concierge'
 import { AiError, statusForCode } from '@/lib/ai/errors'
 import { checkRateLimit } from '@/lib/ai/rate-limit'
-import { aiRequestSchema } from '@/lib/ai/schemas'
+import { MAX_ADVISOR_NOTES, aiRequestSchema } from '@/lib/ai/schemas'
 
 // Requests hit live providers; never cache-touch this route.
 export const dynamic = 'force-dynamic'
@@ -44,6 +44,30 @@ function errorResponse(code: string, message: string, status: number, requestId?
   return NextResponse.json(payload, { status, headers })
 }
 
+/**
+ * Translates schema failures into human-readable guidance. Raw Zod messages
+ * ("Too big: expected array to have <=N items") must never reach the chat UI.
+ */
+function friendlyValidationMessage(issues: { path: PropertyKey[] }[]): string {
+  const path = issues[0]?.path.map(String).join('.') ?? ''
+  if (path === 'context.noteIds') {
+    return `Your blend now has more than ${MAX_ADVISOR_NOTES} notes — the advisor can analyse up to ${MAX_ADVISOR_NOTES}. Remove a note or two and try again.`
+  }
+  if (path === 'history') {
+    return 'The conversation grew too long to analyse. Clear the advisor panel and ask again.'
+  }
+  if (path === 'message') {
+    return 'That message is too long to analyse — try phrasing it more briefly.'
+  }
+  if (path === 'context') {
+    return 'The blend snapshot could not be read. Refresh the builder and try again.'
+  }
+  if (path.startsWith('preferences')) {
+    return 'Those fragrance preferences could not be processed — adjust them and try again.'
+  }
+  return 'That request could not be processed as sent. Try rephrasing it.'
+}
+
 export async function POST(request: Request): Promise<NextResponse> {
   const requestId = correlationId()
 
@@ -63,10 +87,9 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const parsed = aiRequestSchema.safeParse(body)
   if (!parsed.success) {
-    const first = parsed.error.issues[0]
     return errorResponse(
       'invalid_request',
-      first ? `Invalid request: ${first.message}` : 'Invalid request.',
+      friendlyValidationMessage(parsed.error.issues),
       400,
       requestId,
     )

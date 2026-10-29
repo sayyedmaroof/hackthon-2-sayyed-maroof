@@ -1,19 +1,37 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useMemo, useState } from 'react'
 import { calculatePrice, formatPrice } from '@/lib/pricing'
 import { useAuth } from '@/lib/auth-store'
 import { useStudio } from '@/lib/studio-store'
 
+function CheckoutCanceledNotice() {
+  return (
+    <p className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+      Payment was cancelled — nothing was charged and your cart is untouched. You can try again
+      whenever you're ready.
+    </p>
+  )
+}
+
 export default function CheckoutPage() {
-  const { cart, clearCart, recordOrder } = useStudio()
+  const { cart } = useStudio()
   const { user, status } = useAuth()
-  const router = useRouter()
   const [email, setEmail] = useState('')
   const [fullName, setFullName] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [canceled, setCanceled] = useState(false)
+
+  const searchParams = useMemo(
+    () => (typeof window === 'undefined' ? null : new URLSearchParams(window.location.search)),
+    [],
+  )
+
+  // After arriving here from a cancelled Stripe Checkout.
+  useEffect(() => {
+    if (searchParams?.get('canceled') === '1') setCanceled(true)
+  }, [searchParams])
 
   // Prefill checkout details from the signed-in profile. Only empty fields
   // are filled (functional updates), so any manual edits are never clobbered
@@ -31,34 +49,51 @@ export default function CheckoutPage() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
+    if (submitting) return
     setSubmitting(true)
     setError('')
 
     try {
+      // One attempt identifier per intentional submission. Re-clicks or
+      // network retries within this request reuse it (server-side
+      // idempotency); a retry after a failure starts a fresh attempt.
+      const checkoutAttemptId = `chk_${crypto.randomUUID().replace(/-/g, '')}`.slice(0, 64)
+
       const response = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
           fullName,
+          checkoutAttemptId,
           items: cart.map((item) => ({
             id: item.blend.id,
             name: item.blend.name,
             noteIds: item.blend.noteIds,
             bottle: item.blend.bottle,
             quantity: item.quantity,
+            cartItemId: item.id,
           })),
         }),
       })
 
-      const result = await response.json()
-      if (!response.ok) {
-        throw new Error(result.error || 'Checkout failed.')
+      const result = (await response.json().catch(() => null)) as
+        | { checkoutUrl?: string; orderReference?: string; error?: string }
+        | null
+
+      if (!response.ok || !result?.checkoutUrl) {
+        throw new Error(
+          result?.error
+            ? sanitizeCheckoutError(result.error)
+            : 'Checkout could not be started. Your cart is safe — please try again.',
+        )
       }
 
-      recordOrder(result.order)
-      clearCart()
-      router.push(`/checkout/success?ref=${result.order.reference}`)
+      // The cart is intentionally NOT cleared here — only the verified
+      // payment webhook clears purchased entries (see the success page).
+      window.location.assign(result.checkoutUrl)
+      // Keep the button disabled while the external redirect happens.
+      return
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Something went wrong.')
     } finally {
@@ -81,7 +116,7 @@ export default function CheckoutPage() {
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-8">
         <p className="text-xs font-medium uppercase tracking-[0.3em] text-azure">Checkout</p>
-        <h1 className="mt-3 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl md:leading-none">Demo order details.</h1>
+        <h1 className="mt-3 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl md:leading-none">Order details.</h1>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
@@ -97,11 +132,15 @@ export default function CheckoutPage() {
             </label>
           </div>
 
+          {canceled && <CheckoutCanceledNotice />}
           {error && <p className="mt-5 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</p>}
 
           <button type="submit" disabled={submitting} className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-medium text-ice transition hover:bg-sapphire-mid disabled:cursor-not-allowed disabled:opacity-60">
-            {submitting ? 'Submitting demo order...' : 'Complete demo checkout'}
+            {submitting ? 'Redirecting to secure checkout…' : 'Continue to payment'}
           </button>
+          <p className="mt-3 text-center text-xs text-muted-foreground">
+            You'll complete payment on the secure Stripe page — your blend details travel with it.
+          </p>
         </form>
 
         <aside className="rounded-[2rem] border border-border bg-card p-5 shadow-sm">
@@ -126,4 +165,9 @@ export default function CheckoutPage() {
       </div>
     </div>
   )
+}
+
+/** Server messages are already client-safe; trim + de-URL for display. */
+function sanitizeCheckoutError(message: string): string {
+  return message.slice(0, 200)
 }

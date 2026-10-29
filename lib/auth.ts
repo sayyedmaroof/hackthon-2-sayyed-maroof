@@ -9,6 +9,8 @@ export interface AuthUser {
   id: string
   email: string
   name: string
+  /** ISO timestamp of account creation, for "member since" in the profile. */
+  createdAt: string
 }
 
 const SESSION_TTL_DAYS = 30
@@ -56,13 +58,20 @@ export async function getAuthUser(): Promise<AuthUser | null> {
   if (!token) return null
 
   const rows = await db
-    .select({ id: users.id, email: users.email, name: users.name })
+    .select({
+      id: users.id,
+      email: users.email,
+      name: users.name,
+      createdAt: users.createdAt,
+    })
     .from(sessions)
     .innerJoin(users, eq(users.id, sessions.userId))
     .where(and(eq(sessions.token, token), gt(sessions.expiresAt, new Date())))
     .limit(1)
 
-  return rows[0] ?? null
+  const row = rows[0]
+  if (!row) return null
+  return { ...row, createdAt: row.createdAt.toISOString() }
 }
 
 /** Deletes the current session (idempotent — safe to call with no session). */
