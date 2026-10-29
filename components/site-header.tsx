@@ -38,16 +38,8 @@ const mobileItemVariants: Variants = {
   },
 }
 
-const logoSwapVariants: Variants = {
-  hidden: { opacity: 0, y: 8, scale: 0.96 },
-  show: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.26, ease: [0.16, 1, 0.3, 1] },
-  },
-  exit: { opacity: 0, y: -8, scale: 0.96, transition: { duration: 0.16 } },
-}
+/** Shared ease for the logo crossfade */
+const LOGO_CROSSFADE = { duration: 0.3, ease: [0.16, 1, 0.3, 1] } as const
 
 export function SiteHeader() {
   const pathname = usePathname()
@@ -56,13 +48,29 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
-  // Track scroll for header expansion/collapse behavior
+  // Track scroll for header expansion/collapse behavior.
+  // rAF-throttled, with hysteresis (shrink past 72, expand back below 40)
+  // so hovering around the threshold can't re-toggle the state repeatedly
+  // — that oscillation was what made the header flicker while scrolling.
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 64)
-    window.addEventListener('scroll', handleScroll, { passive: true })
+    let raf = 0
+    const update = () => {
+      raf = 0
+      const y = window.scrollY
+      // Same-value setState bails out of a re-render, so this is cheap.
+      setScrolled(prev => (prev ? y > 40 : y > 72))
+    }
+    const onScroll = () => {
+      if (raf) return
+      raf = requestAnimationFrame(update)
+    }
     // Initialize on mount
-    handleScroll()
-    return () => window.removeEventListener('scroll', handleScroll)
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      if (raf) cancelAnimationFrame(raf)
+    }
   }, [])
 
   // Close menu on route change
@@ -71,44 +79,44 @@ export function SiteHeader() {
   }, [pathname])
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[#CCDFF0]/60 bg-[#F5F9FD]/95 shadow-[0_2px_16px_rgba(14,27,51,0.06)] backdrop-blur transition-all duration-300 supports-[backdrop-filter]:bg-[#F5F9FD]/90">
+    <header className="sticky top-0 z-50 border-b border-[#CCDFF0]/60 bg-[#F5F9FD]/95 shadow-[0_2px_16px_rgba(14,27,51,0.06)] backdrop-blur transition-[background-color,box-shadow] duration-300 supports-[backdrop-filter]:bg-[#F5F9FD]/90">
       <div
         className={cn(
-          'mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 transition-all duration-300 sm:px-6 lg:px-8',
+          'mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 transition-[height] duration-300 sm:px-6 lg:px-8',
           scrolled ? 'h-16' : 'h-24 md:h-32',
         )}
       >
-        {/* Logo — full lockup at the top of a page, bottle-only once scrolled */}
+        {/* Logo — full lockup at the top of a page, bottle-only once scrolled.
+            Both variants are stacked and crossfaded (rather than swapped via
+            AnimatePresence) so the link's box never collapses mid-transition
+            — the layout jump between frames read as header flicker. */}
         <Link
           href="/"
-          className="flex items-center self-center focus-visible:outline-none"
+          aria-label="ScentBuild Studio — home"
+          className="relative flex flex-shrink-0 items-center self-center focus-visible:outline-none"
           onClick={() => setOpen(false)}
         >
-          <AnimatePresence mode="wait" initial={false}>
-            {scrolled ? (
-              <motion.span
-                key="logo-compact"
-                initial="hidden"
-                animate="show"
-                exit="exit"
-                variants={logoSwapVariants}
-                className="block"
-              >
-                <BrandLogo compact />
-              </motion.span>
-            ) : (
-              <motion.span
-                key="logo-full"
-                initial="hidden"
-                animate="show"
-                exit="exit"
-                variants={logoSwapVariants}
-                className="block"
-              >
-                <BrandLogo large />
-              </motion.span>
-            )}
-          </AnimatePresence>
+          {/* Full lockup — stays in flow so it defines the link's size */}
+          <motion.span
+            initial={false}
+            animate={{ opacity: scrolled ? 0 : 1, y: scrolled ? 6 : 0, scale: scrolled ? 0.97 : 1 }}
+            transition={LOGO_CROSSFADE}
+            className="block pointer-events-none"
+            aria-hidden={scrolled}
+          >
+            <BrandLogo large />
+          </motion.span>
+          {/* Compact lockup — floats over the same box, vertically centred */}
+          <span className="pointer-events-none absolute left-0 top-1/2 flex -translate-y-1/2" aria-hidden={!scrolled}>
+            <motion.span
+              initial={false}
+              animate={{ opacity: scrolled ? 1 : 0, y: scrolled ? 0 : -6, scale: scrolled ? 1 : 0.97 }}
+              transition={LOGO_CROSSFADE}
+              className="block"
+            >
+              <BrandLogo compact />
+            </motion.span>
+          </span>
         </Link>
 
         {/* Desktop nav */}

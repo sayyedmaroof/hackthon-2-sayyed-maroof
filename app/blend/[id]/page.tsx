@@ -13,7 +13,7 @@ export default async function BlendPage({ params }: { params: Promise<{ id: stri
   if (!preset) return notFound()
 
   const notes = preset.noteIds.map((noteId) => NOTES_BY_ID[noteId]).filter(Boolean)
-  const profile = computeProfile(preset.noteIds)
+  const profile = computeProfile(preset.noteIds, preset.bottle.concentration)
   const price = calculatePrice(preset.noteIds, preset.bottle)
 
   return (

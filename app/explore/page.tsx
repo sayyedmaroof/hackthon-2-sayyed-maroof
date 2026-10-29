@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Search, Sparkles, Star } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { PresetCard } from '@/components/preset-card'
+import { AddPresetButton } from '@/components/add-preset-button'
 import { SpotlightCard } from '@/components/ui/spotlight-card'
 import { FAMILY_LABELS, PRESETS } from '@/lib/fragrance-data'
 import { calculatePrice, formatPrice } from '@/lib/pricing'
@@ -96,6 +97,8 @@ function DesignerInspiredCard({ preset }: { preset: FragrancePreset }) {
           >
             Create Your Version
           </Link>
+          {/* Add the curated blend to the cart as-is */}
+          <AddPresetButton preset={preset} />
           <Link
             href={`/blend/${preset.id}`}
             className="rounded-full border-2 border-[#CCDFF0] bg-white px-4 py-3 text-sm font-medium text-[#0E1B33] transition-all hover:border-[#1E63C8] hover:bg-[#F5F9FD]"

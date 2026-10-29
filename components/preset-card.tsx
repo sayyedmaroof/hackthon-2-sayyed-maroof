@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { SpotlightCard } from '@/components/ui/spotlight-card'
+import { AddPresetButton } from '@/components/add-preset-button'
 import { FAMILY_LABELS } from '@/lib/fragrance-data'
 import { calculatePrice, formatPrice } from '@/lib/pricing'
 import type { FragrancePreset } from '@/lib/types'
@@ -98,6 +99,7 @@ export function PresetCard({
           >
             Customize
           </Link>
+          <AddPresetButton preset={preset} dark={dark}/>
           <Link
             href={`/blend/${preset.id}`}
             className={cn(

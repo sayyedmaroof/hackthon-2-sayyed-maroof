@@ -1,17 +1,28 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { calculatePrice, formatPrice } from '@/lib/pricing'
+import { useAuth } from '@/lib/auth-store'
 import { useStudio } from '@/lib/studio-store'
 
 export default function CheckoutPage() {
   const { cart, clearCart, recordOrder } = useStudio()
+  const { user, status } = useAuth()
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [fullName, setFullName] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+
+  // Prefill checkout details from the signed-in profile. Only empty fields
+  // are filled (functional updates), so any manual edits are never clobbered
+  // — including when the session resolves after mount or mid-checkout sign-in.
+  useEffect(() => {
+    if (status !== 'authed' || !user) return
+    setFullName((current) => current || user.name)
+    setEmail((current) => current || user.email)
+  }, [user, status])
 
   const subtotal = cart.reduce(
     (sum, item) => sum + calculatePrice(item.blend.noteIds, item.blend.bottle).unitTotal * item.quantity,

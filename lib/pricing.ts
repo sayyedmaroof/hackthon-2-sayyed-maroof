@@ -11,10 +11,10 @@ import type {
   PriceBreakdown,
 } from './types'
 
-export const SIZE_OPTIONS: { value: BottleSize; label: string; multiplier: number }[] = [
-  { value: 30, label: '30 ml', multiplier: 0.75 },
-  { value: 50, label: '50 ml', multiplier: 1 },
-  { value: 100, label: '100 ml', multiplier: 1.7 },
+export const SIZE_OPTIONS: { value: BottleSize; label: string; detail: string; multiplier: number }[] = [
+  { value: 30, label: '30 ml', detail: 'Traveller', multiplier: 0.75 },
+  { value: 50, label: '50 ml', detail: 'Everyday classic', multiplier: 1 },
+  { value: 100, label: '100 ml', detail: 'Grand flacon', multiplier: 1.7 },
 ]
 
 export const CONCENTRATION_OPTIONS: {
@@ -38,9 +38,9 @@ export const ATOMIZER_MATERIAL_OPTIONS: { value: AtomizerMaterial; label: string
   { value: 'metal', label: 'Brushed copper', price: 8 },
 ]
 
-export const ATOMIZER_TYPE_OPTIONS: { value: AtomizerType; label: string; price: number }[] = [
-  { value: 'normal', label: 'Standard mist', price: 0 },
-  { value: 'pressurized', label: 'Pressurized fine mist', price: 6 },
+export const ATOMIZER_TYPE_OPTIONS: { value: AtomizerType; label: string; detail: string; price: number }[] = [
+  { value: 'normal', label: 'Standard mist', detail: 'Even, quiet spray pattern', price: 0 },
+  { value: 'pressurized', label: 'Pressurized fine mist', detail: 'Micro-mist that floats longer', price: 6 },
 ]
 
 export const LABEL_OPTIONS: { value: LabelStyle; label: string; swatch: string }[] = [
