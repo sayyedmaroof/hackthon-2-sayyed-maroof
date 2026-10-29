@@ -25,7 +25,7 @@ export async function POST(request: Request) {
   }
 
   const rows = await db
-    .select({ id: users.id, email: users.email, name: users.name, passwordHash: users.passwordHash })
+    .select({ id: users.id, email: users.email, name: users.name, passwordHash: users.passwordHash, createdAt: users.createdAt })
     .from(users)
     .where(eq(users.email, email))
     .limit(1)
@@ -37,7 +37,12 @@ export async function POST(request: Request) {
 
   const token = await createSession(account.id)
   const response = NextResponse.json({
-    user: { id: account.id, email: account.email, name: account.name },
+    user: {
+      id: account.id,
+      email: account.email,
+      name: account.name,
+      createdAt: account.createdAt.toISOString(),
+    },
   })
   response.cookies.set(SESSION_COOKIE, token, cookieOptions())
   return response

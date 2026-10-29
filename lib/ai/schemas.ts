@@ -28,8 +28,13 @@ export const historyEntrySchema = z.object({
 
 // ─── Request schemas (browser → API) ────────────────────────────────────────
 
+// The builder itself does not hard-cap how many notes a blend can accumulate,
+// so the advisor context cap must be a generous ceiling (kept low enough to
+// bound prompt size) rather than an easily reachable failure.
+export const MAX_ADVISOR_NOTES = 24
+
 export const builderContextSchema = z.strictObject({
-  noteIds: z.array(z.string().max(48)).max(12),
+  noteIds: z.array(z.string().max(48)).max(MAX_ADVISOR_NOTES),
   concentration: concentrationSchema,
 })
 

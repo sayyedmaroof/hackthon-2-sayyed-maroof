@@ -6,6 +6,8 @@ export interface AuthUser {
   id: string
   email: string
   name: string
+  /** ISO timestamp of account creation — shown as "member since" in the profile. */
+  createdAt?: string
 }
 
 export type AuthStatus = 'loading' | 'authed' | 'guest'

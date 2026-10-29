@@ -354,7 +354,7 @@ function BuilderContent() {
                 onChange={e => setName(e.target.value)}
                 placeholder="Name your blend…"
                 maxLength={32}
-                className="min-w-0 flex-1 rounded-full border border-[#CCDFF0] bg-[#FDFEFF] px-5 py-3 font-serif text-lg text-[#0E1B33] outline-none transition focus:border-[#1E63C8] focus:ring-2 focus:ring-[#1E63C8]/20"
+                className="min-w-0 flex-1 rounded-full border border-[#CCDFF0] bg-[#FDFEFF] px-5 py-3 font-serif text-lg font-medium text-[#0E1B33] outline-none transition focus:border-[#1E63C8] focus:ring-2 focus:ring-[#1E63C8]/20"
               />
               <span className="shrink-0 rounded-full border border-[#CCDFF0] bg-[#FDFEFF] px-3 py-2 text-sm font-medium text-[#5C728F]">
                 {draft.noteIds.length} note
