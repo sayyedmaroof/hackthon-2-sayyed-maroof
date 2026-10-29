@@ -151,6 +151,47 @@
   transform: scale(0.97);
 }
 
+/* ── Glass bottle stage effects ────────────────────────────────────────────── */
+
+/* Diagonal light streak glides across the glass on stage hover */
+.bottle-sheen {
+  opacity: 0;
+}
+.bottle-stage:hover .bottle-sheen,
+.bottle-stage:focus-within .bottle-sheen {
+  animation: bottle-sheen-sweep 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes bottle-sheen-sweep {
+  0% {
+    opacity: 0;
+    transform: translateX(-150px);
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(160px);
+  }
+}
+
+/* Micro-bubbles drift gently inside the liquid column */
+.bottle-bubble {
+  animation: bottle-bubble-drift 6s ease-in-out infinite;
+}
+@keyframes bottle-bubble-drift {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
 /* Barely-there film grain over the whole page for extra depth */
 body::after {
   content: '';

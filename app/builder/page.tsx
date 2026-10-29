@@ -1,6 +1,11 @@
 'use client'
 
-import { AnimatePresence, motion } from 'framer-motion'
+import {
+  AnimatePresence,
+  motion,
+  useAnimationControls,
+  type Variants,
+} from 'framer-motion'
 import {
   AlertCircle,
   Check,
@@ -13,13 +18,13 @@ import {
   ShoppingBag,
   X,
 } from 'lucide-react'
-import { Suspense, useEffect, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { GlassBottle } from '@/components/glass-bottle'
 import { NoteCard } from '@/components/note-card'
 import { ScentAdvisor } from '@/components/scent-advisor'
-import { FamilyMix, ProfileBars } from '@/components/scent-profile'
+import { FamilyMix, EvolutionTimeline, ProfileBars } from '@/components/scent-profile'
 import { Walkthrough, type WalkthroughStep } from '@/components/walkthrough'
 import {
   FAMILIES,
@@ -32,6 +37,7 @@ import {
 import { fadeUp, staggerContainer } from '@/lib/motion'
 import {
   calculatePrice,
+  ATOMIZER_TYPE_OPTIONS,
   BASE_OPTIONS,
   CONCENTRATION_OPTIONS,
   formatPrice,
@@ -135,10 +141,13 @@ function BuilderContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const profile = useMemo(() => computeProfile(draft.noteIds), [draft.noteIds])
+  const profile = useMemo(
+    () => computeProfile(draft.noteIds, draft.bottle.concentration),
+    [draft.noteIds, draft.bottle.concentration],
+  )
   const validation = useMemo(
-    () => validateBlend(draft.noteIds),
-    [draft.noteIds],
+    () => validateBlend(draft.noteIds, draft.bottle.concentration),
+    [draft.noteIds, draft.bottle.concentration],
   )
   const price = useMemo(
     () => calculatePrice(draft.noteIds, draft.bottle),
@@ -146,6 +155,25 @@ function BuilderContent() {
   )
 
   const liquidColor = profile?.color ?? EMPTY_BLEND_COLOR
+
+  // ── Bottle "swish" ripple: a soft squash-and-recover whenever a bottle
+  //    option (size, concentration, shape, atomizer, label, base) changes.
+  const bottlePulse = useAnimationControls()
+  const prevBottleSig = useRef<string | null>(null)
+  const bottleSignature = JSON.stringify(draft.bottle)
+  useEffect(() => {
+    if (prevBottleSig.current === null) {
+      prevBottleSig.current = bottleSignature
+      return
+    }
+    if (prevBottleSig.current === bottleSignature) return
+    prevBottleSig.current = bottleSignature
+    bottlePulse.start({
+      scale: [1, 1.04, 0.985, 1],
+      opacity: [1, 0.97, 1],
+      transition: { duration: 0.6, ease: 'easeInOut' },
+    })
+  }, [bottleSignature, bottlePulse])
 
   // Filter notes for the active layer
   const layerNotes = useMemo(() => {
@@ -199,6 +227,12 @@ function BuilderContent() {
         return
       }
       toast.success(`${result.note.name} added.`)
+      if (result.warnings && result.warnings.length > 0) {
+        const first = result.warnings[0]
+        toast.warning(first.message, {
+          description: first.suggestion,
+        })
+      }
     }
   }
 
@@ -373,41 +407,54 @@ function BuilderContent() {
                   const count = countByLayer[layer]
                   const isActive = activeLayer === layer
                   return (
-                    <button
+                    <motion.button
                       key={layer}
                       type="button"
                       onClick={() => setActiveLayer(layer)}
+                      whileTap={{ scale: 0.94 }}
                       className={cn(
-                        'relative flex flex-col items-center gap-0.5 rounded-xl px-2 py-3 text-center transition-all duration-200',
+                        'relative flex flex-col items-center gap-0.5 rounded-xl px-2 py-3 text-center transition-colors duration-200',
                         isActive
-                          ? 'bg-[#0E1B33] text-[#F5F9FD] shadow-sm'
+                          ? 'text-[#F5F9FD]'
                           : 'text-[#5C728F] hover:bg-[#E4EEF8] hover:text-[#0E1B33]',
                       )}
                     >
-                      {/* Layer color indicator */}
-                      <span
-                        className="mb-0.5 inline-block size-2 rounded-full"
-                        style={{
-                          backgroundColor: isActive
-                            ? acc.color
-                            : `${acc.color}99`,
-                        }}
-                        aria-hidden="true"
-                      />
-                      <span className="text-xs font-medium uppercase tracking-[0.12em]">
-                        {acc.label}
-                      </span>
-                      <span
-                        className={cn(
-                          'text-[0.6rem] uppercase tracking-[0.15em]',
-                          isActive ? 'text-[#F5F9FD]/50' : 'text-[#5C728F]/60',
-                        )}
-                      >
-                        {acc.range}
-                      </span>
-                      {/* Selected count badge */}
-                      {count > 0 && (
+                      {/* Sliding active pill — glides between tabs */}
+                      {isActive && (
+                        <motion.span
+                          layoutId="layer-active-pill"
+                          transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                          className="absolute inset-0 rounded-xl bg-[#0E1B33] shadow-sm"
+                        />
+                      )}
+                      <span className="relative z-10 flex flex-col items-center gap-0.5">
+                        {/* Layer color indicator */}
                         <span
+                          className="mb-0.5 inline-block size-2 rounded-full"
+                          style={{
+                            backgroundColor: isActive ? acc.color : `${acc.color}99`,
+                          }}
+                          aria-hidden="true"
+                        />
+                        <span className="text-xs font-medium uppercase tracking-[0.12em]">
+                          {acc.label}
+                        </span>
+                        <span
+                          className={cn(
+                            'text-[0.6rem] uppercase tracking-[0.15em]',
+                            isActive ? 'text-[#F5F9FD]/50' : 'text-[#5C728F]/60',
+                          )}
+                        >
+                          {acc.range}
+                        </span>
+                      </span>
+                      {/* Selected count badge — pops on every change */}
+                      {count > 0 && (
+                        <motion.span
+                          key={count}
+                          initial={{ scale: 0.4, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ type: 'spring', stiffness: 500, damping: 22 }}
                           className={cn(
                             'absolute right-2 top-2 flex size-4 items-center justify-center rounded-full text-[0.55rem] font-bold',
                             isActive
@@ -416,9 +463,9 @@ function BuilderContent() {
                           )}
                         >
                           {count}
-                        </span>
+                        </motion.span>
                       )}
-                    </button>
+                    </motion.button>
                   )
                 })}
               </div>
@@ -584,22 +631,32 @@ function BuilderContent() {
                 />
               </button>
 
-              <AnimatePresence>
+              <AnimatePresence initial={false}>
                 {showBottleOptions && (
                   <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.26, ease: [0.4, 0, 0.2, 1] }}
+                    initial={{ height: 0, opacity: 0, y: -6 }}
+                    animate={{ height: 'auto', opacity: 1, y: 0 }}
+                    exit={{ height: 0, opacity: 0, y: -6 }}
+                    transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
                     className="overflow-hidden"
                   >
-                    <div className="space-y-5 border-t border-[#CCDFF0] px-5 py-5">
+                    <motion.div
+                      initial="hidden"
+                      animate="show"
+                      variants={{
+                        hidden: {},
+                        show: { transition: { staggerChildren: 0.045, delayChildren: 0.08 } },
+                      }}
+                      className="space-y-5 border-t border-[#CCDFF0] px-5 py-5"
+                    >
                       {/* Size */}
                       <BottleOptionRow
                         label="Size"
+                        hint="A larger flacon holds more of your blend"
                         options={SIZE_OPTIONS.map(o => ({
                           value: String(o.value),
                           label: o.label,
+                          detail: o.detail,
                         }))}
                         value={String(draft.bottle.size)}
                         onChange={v =>
@@ -642,8 +699,8 @@ function BuilderContent() {
                       <BottleOptionRow
                         label="Bottle shape"
                         options={[
-                          { value: 'classic', label: 'Classic' },
-                          { value: 'designer', label: 'Designer facet' },
+                          { value: 'classic', label: 'Classic', detail: 'Straight-wall flacon' },
+                          { value: 'designer', label: 'Designer facet', detail: 'Faceted, octagonal glass' },
                         ]}
                         value={draft.bottle.bottleType}
                         onChange={v =>
@@ -653,10 +710,10 @@ function BuilderContent() {
 
                       {/* Atomizer material */}
                       <BottleOptionRow
-                        label="Atomizer"
+                        label="Atomizer finish"
                         options={[
-                          { value: 'plastic', label: 'Matte polymer' },
-                          { value: 'metal', label: 'Brushed copper +$8' },
+                          { value: 'plastic', label: 'Matte polymer', detail: 'Soft-touch, understated' },
+                          { value: 'metal', label: 'Brushed copper +$8', detail: 'Knurled, engraved cap' },
                         ]}
                         value={draft.bottle.atomizerMaterial}
                         onChange={v =>
@@ -666,35 +723,67 @@ function BuilderContent() {
                         }
                       />
 
+                      {/* Atomizer mist system */}
+                      <BottleOptionRow
+                        label="Mist system"
+                        options={ATOMIZER_TYPE_OPTIONS.map(o => ({
+                          value: o.value,
+                          label: o.value === 'pressurized' ? `${o.label} +$${o.price}` : o.label,
+                          detail: o.detail,
+                        }))}
+                        value={draft.bottle.atomizerType}
+                        onChange={v =>
+                          setBottle({
+                            atomizerType: v as 'normal' | 'pressurized',
+                          })
+                        }
+                      />
+
                       {/* Label */}
-                      <div>
+                      <motion.div variants={panelRow}>
                         <p className="mb-2 text-xs font-medium uppercase tracking-[0.25em] text-[#5C728F]">
                           Label
                         </p>
                         <div className="flex gap-2">
-                          {LABEL_OPTIONS.map(o => (
-                            <button
-                              key={o.value}
-                              type="button"
-                              onClick={() => setBottle({ labelStyle: o.value })}
-                              className={cn(
-                                'flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
-                                draft.bottle.labelStyle === o.value
-                                  ? 'border-[#1E63C8] bg-[#1E63C8]/10 text-[#1E63C8]'
-                                  : 'border-[#CCDFF0] text-[#5C728F] hover:border-[#1E63C8]/40',
-                              )}
-                            >
-                              <span
-                                className="size-3 rounded-full border border-[#CCDFF0]"
-                                style={{ backgroundColor: o.swatch }}
-                                aria-hidden="true"
-                              />
-                              {o.label}
-                            </button>
-                          ))}
+                          {LABEL_OPTIONS.map(o => {
+                            const active = draft.bottle.labelStyle === o.value
+                            return (
+                              <motion.button
+                                key={o.value}
+                                type="button"
+                                onClick={() => setBottle({ labelStyle: o.value })}
+                                whileHover={{ y: -2 }}
+                                whileTap={{ scale: 0.94 }}
+                                className={cn(
+                                  'relative flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
+                                  active
+                                    ? 'border-transparent text-[#1E63C8]'
+                                    : 'border-[#CCDFF0] text-[#5C728F] hover:border-[#1E63C8]/40',
+                                )}
+                              >
+                                {/* Sliding selection ring */}
+                                {active && (
+                                  <motion.span
+                                    layoutId="label-active-ring"
+                                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                                    className="absolute inset-0 rounded-full border border-[#1E63C8]/70 bg-[#1E63C8]/10"
+                                  />
+                                )}
+                                <span
+                                  className={cn(
+                                    'relative z-10 size-3 rounded-full border shadow-[inset_0_1px_2px_rgba(0,0,0,0.25)]',
+                                    active ? 'border-[#1E63C8]/50' : 'border-[#CCDFF0]',
+                                  )}
+                                  style={{ backgroundColor: o.swatch }}
+                                  aria-hidden="true"
+                                />
+                                <span className="relative z-10">{o.label}</span>
+                              </motion.button>
+                            )
+                          })}
                         </div>
-                      </div>
-                    </div>
+                      </motion.div>
+                    </motion.div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -779,7 +868,9 @@ function BuilderContent() {
                 className="rounded-[2rem] border border-[#CCDFF0] bg-[#FDFEFF] p-6"
               >
                 {/* Bottle visual */}
-                <div className="relative mx-auto flex max-w-[240px] items-center justify-center">
+                <div
+                  className="bottle-stage relative mx-auto flex max-w-[240px] items-center justify-center"
+                >
                   {/* Ambient glow behind bottle */}
                   <div
                     aria-hidden="true"
@@ -796,13 +887,20 @@ function BuilderContent() {
                     transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                     className="w-full"
                   >
-                    <GlassBottle
-                      name={draft.name}
-                      color={liquidColor}
-                      bottle={draft.bottle}
-                      noteCount={draft.noteIds.length}
-                      className="drop-shadow-[0_20px_40px_rgba(0,0,0,0.22)]"
-                    />
+                    {/* Ripples gently whenever a bottle option changes */}
+                    <motion.div
+                      animate={bottlePulse}
+                      style={{ transformOrigin: '50% 88%' }}
+                      className="w-full"
+                    >
+                      <GlassBottle
+                        name={draft.name}
+                        color={liquidColor}
+                        bottle={draft.bottle}
+                        noteCount={draft.noteIds.length}
+                        className="drop-shadow-[0_20px_40px_rgba(0,0,0,0.22)]"
+                      />
+                    </motion.div>
                   </motion.div>
                 </div>
 
@@ -939,6 +1037,14 @@ function BuilderContent() {
                   <div className="mt-4">
                     <ProfileBars profile={profile} compact />
                   </div>
+                  <div className="mt-4 rounded-xl border border-[#CCDFF0] bg-[#F5F9FD] p-3">
+                    <p className="text-xs font-medium uppercase tracking-[0.25em] text-[#5C728F]">
+                      How it wears
+                    </p>
+                    <div className="mt-3">
+                      <EvolutionTimeline profile={profile} />
+                    </div>
+                  </div>
                 </motion.div>
               )}
 
@@ -991,6 +1097,39 @@ function BuilderContent() {
                     </div>
                   </div>
                 )}
+
+                {/* Perfumer's review — advisory formula notes */}
+                <AnimatePresence>
+                  {validation.warnings.length > 0 && (
+                    <motion.div
+                      key="perfumer-review"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="rounded-2xl border border-[#CCDFF0] bg-[#FDFEFF] p-4">
+                        <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.3em] text-[#1E63C8]">
+                          <Info className="size-3.5" aria-hidden="true" />
+                          Perfumer&rsquo;s review
+                        </p>
+                        <ul className="mt-3 space-y-2.5">
+                          {validation.warnings.slice(0, 4).map((warning) => (
+                            <li key={warning.id} className="text-sm text-[#41546E]">
+                              <span className="mr-1.5 text-[0.6rem] font-semibold uppercase tracking-[0.15em] text-[#8A6A50]">
+                                {warning.type}
+                              </span>
+                              {warning.message}
+                              {warning.suggestion && (
+                                <p className="mt-0.5 text-xs text-[#5C728F]">{warning.suggestion}</p>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
               {/* Scent Advisor */}
               <ScentAdvisor
@@ -1079,49 +1218,118 @@ function BuilderContent() {
   )
 }
 
-// ─── Bottle option row helper ─────────────────────────────────────────────────
+// ─── Panel row reveal variant ────────────────────────────────────────────────
+
+const panelRow: Variants = {
+  hidden: { opacity: 0, y: 10 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
+  },
+}
+
+// ─── Bottle option row helper ────────────────────────────────────────────────
 
 function BottleOptionRow({
   label,
+  hint,
   options,
   value,
   onChange,
   wide = false,
 }: {
   label: string
+  hint?: string
   options: { value: string; label: string; detail?: string }[]
   value: string
   onChange: (v: string) => void
   wide?: boolean
 }) {
+  const layoutKey = `bottle-opt-${label.replace(/\s+/g, '-').toLowerCase()}`
   return (
-    <div>
-      <p className="mb-2 text-xs font-medium uppercase tracking-[0.25em] text-[#5C728F]">
-        {label}
-      </p>
-      <div className={cn('flex flex-wrap gap-2', wide ? 'flex-col' : '')}>
-        {options.map(o => (
-          <button
-            key={o.value}
-            type="button"
-            onClick={() => onChange(o.value)}
-            className={cn(
-              'flex flex-col rounded-xl border px-3 py-2 text-left text-xs font-medium transition-colors',
-              value === o.value
-                ? 'border-[#1E63C8] bg-[#1E63C8]/10 text-[#1E63C8]'
-                : 'border-[#CCDFF0] text-[#5C728F] hover:border-[#1E63C8]/40 hover:text-[#0E1B33]',
-            )}
-          >
-            {o.label}
-            {o.detail && (
-              <span className="mt-0.5 font-normal text-[#5C728F]/70">
-                {o.detail}
-              </span>
-            )}
-          </button>
-        ))}
+    <motion.div variants={panelRow}>
+      <div className="mb-2 flex items-baseline justify-between gap-3">
+        <p className="text-xs font-medium uppercase tracking-[0.25em] text-[#5C728F]">
+          {label}
+        </p>
+        {hint && (
+          <p className="hidden text-[0.65rem] italic font-serif text-[#5C728F]/70 sm:block">
+            {hint}
+          </p>
+        )}
       </div>
-    </div>
+      <div
+        role="radiogroup"
+        aria-label={label}
+        className={cn('flex flex-wrap gap-2', wide ? 'flex-col' : '')}
+      >
+        {options.map(o => {
+          const active = value === o.value
+          return (
+            <motion.button
+              key={o.value}
+              type="button"
+              role="radio"
+              aria-checked={active}
+              onClick={() => onChange(o.value)}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 420, damping: 26 }}
+              className={cn(
+                'relative flex rounded-xl px-3.5 py-2.5 text-left text-xs font-medium transition-colors duration-200',
+                wide ? 'items-center justify-between gap-4' : 'flex-col',
+                active
+                  ? 'border border-transparent text-[#1E63C8]'
+                  : 'border border-[#CCDFF0] text-[#5C728F] hover:border-[#1E63C8]/40 hover:text-[#0E1B33]',
+              )}
+            >
+              {/* Sliding active-state ring — glides between sibling options */}
+              {active && (
+                <motion.span
+                  layoutId={layoutKey}
+                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                  className="absolute inset-0 rounded-xl border border-[#1E63C8]/70 bg-gradient-to-br from-[#1E63C8]/12 via-[#1E63C8]/6 to-transparent shadow-[0_8px_20px_rgba(30,99,200,0.14)]"
+                />
+              )}
+              {wide ? (
+                <span className="relative z-10 flex flex-col">
+                  <span>{o.label}</span>
+                  {o.detail && (
+                    <span className="mt-0.5 font-normal text-[#5C728F]/70">
+                      {o.detail}
+                    </span>
+                  )}
+                </span>
+              ) : (
+                <span className="relative z-10">
+                  {o.label}
+                  {o.detail && (
+                    <span className="mt-0.5 block font-normal text-[#5C728F]/70">
+                      {o.detail}
+                    </span>
+                  )}
+                </span>
+              )}
+              {/* Active tick pops in with a spring */}
+              <AnimatePresence>
+                {active && (
+                  <motion.span
+                    initial={{ opacity: 0, scale: 0.4 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.4 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 24 }}
+                    className="absolute -right-1.5 -top-1.5 z-10 flex size-4 items-center justify-center rounded-full bg-[#1E63C8] text-[#F5F9FD] shadow-[0_2px_6px_rgba(30,99,200,0.4)]"
+                  >
+                    <Check className="size-2.5" aria-hidden="true" />
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.button>
+          )
+        })}
+      </div>
+    </motion.div>
   )
 }
 

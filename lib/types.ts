@@ -111,6 +111,29 @@ export interface ScentProfile {
   genderLean: string
   ageRange: string
   color: string
+  /** Shares of presence weight per layer (realistic pyramid proportion). */
+  pyramid: { top: number; middle: number; base: number }
+  /** How the blend unfolds on skin, calibrated to realistic wear timings. */
+  evolution: ProfilePhase[]
+  /** Names of fixative base materials anchoring the drydown. */
+  fixativeNames: string[]
+}
+
+export interface ProfilePhase {
+  phase: 'Opening' | 'Heart' | 'Drydown'
+  /** Realistic window on skin, e.g. '15 min – 3 h'. */
+  window: string
+  description: string
+}
+
+export type BlendWarningType = 'structure' | 'balance' | 'performance' | 'safety' | 'coherence'
+
+/** Advisory note from the formula-review engine (non-blocking). */
+export interface BlendWarning {
+  id: string
+  type: BlendWarningType
+  message: string
+  suggestion?: string
 }
 
 export interface PriceBreakdown {

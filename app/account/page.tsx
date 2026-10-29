@@ -13,7 +13,7 @@ import { EMPTY_BLEND_COLOR, computeProfile } from '@/lib/scoring'
 import type { Blend } from '@/lib/types'
 
 function blendMeta(blend: Blend) {
-  const profile = computeProfile(blend.noteIds)
+  const profile = computeProfile(blend.noteIds, blend.bottle.concentration)
   const family = profile ? FAMILY_LABELS[profile.family] : null
   const color = profile?.color ?? EMPTY_BLEND_COLOR
   return { profile, family, color }

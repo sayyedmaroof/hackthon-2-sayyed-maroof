@@ -82,15 +82,50 @@ export function ProfileFacts({ profile, dark }: { profile: Profile; dark?: boole
     { label: 'Season', value: profile.seasons.map((s) => SEASON_LABELS[s]).join(', ') },
     { label: 'Leans', value: profile.genderLean },
     { label: 'Age range', value: profile.ageRange },
+    { label: 'Anchors', value: profile.fixativeNames.length ? profile.fixativeNames.join(', ') : 'None yet' },
   ]
   return (
     <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
       {facts.map((fact) => (
         <div key={fact.label}>
           <dt className={cn('text-[0.65rem] uppercase tracking-[0.2em]', dark ? 'text-azure-light' : 'text-azure')}>{fact.label}</dt>
-          <dd className={cn('mt-0.5 text-sm', dark ? 'text-ice' : 'text-foreground')}>{fact.value}</dd>
+          <dd className={cn('mt-0.5 max-w-48 text-sm', dark ? 'text-ice' : 'text-foreground')}>{fact.value}</dd>
         </div>
       ))}
     </dl>
+  )
+}
+
+/**
+ * Wear curve: how the blend unfolds on skin, with realistic windows from the
+ * olfactory pyramid (opening ≤ 30 min, heart to ~3 h, drydown 3 h+).
+ */
+export function EvolutionTimeline({ profile, dark }: { profile: Profile; dark?: boolean }) {
+  return (
+    <ol>
+      {profile.evolution.map((phase, index) => (
+        <li key={phase.phase} className="relative flex gap-3 pb-3 last:pb-0">
+          {index < profile.evolution.length - 1 && (
+            <span
+              aria-hidden="true"
+              className={cn('absolute top-4 left-[7px] h-full w-px', dark ? 'bg-azure-light/30' : 'bg-[#CCDFF0]')}
+            />
+          )}
+          <span
+            className={cn(
+              'z-10 mt-1 flex size-3.5 shrink-0 items-center justify-center rounded-full border-2',
+              dark ? 'border-azure-light bg-[#0E1B33]' : 'border-[#1E63C8] bg-[#FDFEFF]',
+            )}
+          />
+          <div className="min-w-0">
+            <p className={cn('text-xs font-medium tracking-wide', dark ? 'text-azure-light' : 'text-[#1E63C8]')}>
+              {phase.phase}
+              <span className={cn('ml-2 font-normal', dark ? 'text-ice/60' : 'text-[#5C728F]')}>{phase.window}</span>
+            </p>
+            <p className={cn('mt-1 text-sm', dark ? 'text-ice/85' : 'text-[#41546E]')}>{phase.description}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
   )
 }

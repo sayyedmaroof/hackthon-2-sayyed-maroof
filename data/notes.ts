@@ -1,0 +1,190 @@
+import type {
+  Family,
+  FragranceNote,
+  Layer,
+  Occasion,
+  Season,
+} from '@/lib/types'
+import notesImages from './notes-images.json'
+
+type NoteDraft = Omit<FragranceNote, 'image'>
+
+function n(
+  id: string,
+  name: string,
+  layer: Layer,
+  family: Family,
+  description: string,
+  price: number,
+  color: string,
+  attrs: [number, number, number, number, number, number, number],
+  occasions: Occasion[],
+  seasons: Season[],
+): NoteDraft {
+  const [freshness, sweetness, warmth, intensity, longevity, projection, polarizing] =
+    attrs
+  return {
+    id,
+    name,
+    layer,
+    family,
+    description,
+    price,
+    color,
+    attributes: {
+      freshness,
+      sweetness,
+      warmth,
+      intensity,
+      longevity,
+      projection,
+      polarizing,
+    },
+    occasions,
+    seasons,
+  }
+}
+
+/**
+ * House catalogue of widely used perfume materials.
+ * Scores are original house assessments (1–10), not copied from third-party sites.
+ */
+const catalogue: NoteDraft[] = [
+  // ─── TOP ────────────────────────────────────────────────────────────────
+  n('bergamot', 'Bergamot', 'top', 'citrus', 'Sparkling Calabrian citrus with a distinctive tea-like bitterness and green radiance.', 9, '#DFC84A', [9, 3, 2, 5, 2, 6, 1], ['day', 'office'], ['spring', 'summer']),
+  n('lemon', 'Sicilian Lemon', 'top', 'citrus', 'Sharp, zesty and mouthwatering. A burst of pure effervescent brightness.', 7, '#F2E535', [10, 2, 1, 6, 1, 6, 2], ['day', 'office'], ['summer', 'spring']),
+  n('grapefruit', 'Pink Grapefruit', 'top', 'citrus', 'Juicy and slightly bitter, with a sparkling rosy-golden edge.', 8, '#F0A060', [9, 3, 1, 5, 2, 6, 3], ['day'], ['summer', 'spring']),
+  n('mandarin', 'Mandarin Orange', 'top', 'citrus', 'Ripe, sweet and slightly floral. Warmer and rounder than lemon.', 8, '#F07828', [7, 6, 3, 5, 2, 5, 2], ['day', 'office'], ['spring', 'summer', 'autumn']),
+  n('yuzu', 'Japanese Yuzu', 'top', 'citrus', 'Tart and aromatic Japanese citrus — grapefruit meets lemon meets floral.', 14, '#D8E040', [9, 2, 1, 6, 2, 7, 5], ['day'], ['spring', 'summer']),
+  n('lime', 'Persian Lime', 'top', 'citrus', 'Sharp green citrus with a juicy peel snap and a cooling, almost minty lift.', 7, '#A8D030', [10, 2, 1, 6, 1, 6, 2], ['day', 'office'], ['summer', 'spring']),
+  n('neroli', 'Neroli', 'top', 'citrus', 'Steam-distilled bitter orange blossom — bright, honeyed and airy rather than indolic.', 16, '#F4E6A0', [8, 5, 3, 6, 3, 6, 2], ['day', 'date'], ['spring', 'summer']),
+  n('bitter-orange', 'Bitter Orange', 'top', 'citrus', 'Bigarade peel: dry, pithy citrus with a sophisticated bitter backbone.', 9, '#E88820', [8, 2, 2, 6, 2, 6, 4], ['day', 'office'], ['summer', 'spring']),
+  n('blood-orange', 'Blood Orange', 'top', 'citrus', 'Ruby-fleshed orange — jammy, wine-like sweetness under a bright peel.', 9, '#D44028', [7, 6, 3, 5, 2, 5, 2], ['day', 'date'], ['spring', 'summer', 'autumn']),
+  n('citron', 'Citron', 'top', 'citrus', 'Ancient citrus with a waxy, floral peel and less juice-sweetness than lemon.', 11, '#E8DC70', [8, 3, 2, 5, 2, 5, 3], ['day', 'office'], ['spring', 'summer']),
+  n('lemon-verbena', 'Lemon Verbena', 'top', 'citrus', 'Leafy lemon herb — sparkling citral over a soft green tea nuance.', 10, '#C8D848', [9, 3, 2, 5, 3, 6, 3], ['day', 'office'], ['spring', 'summer']),
+  n('pineapple', 'Pineapple', 'top', 'fresh', 'Tropical golden fruit: juicy, slightly tart, with a creamy ripe core.', 8, '#E8C030', [7, 7, 2, 5, 2, 6, 3], ['day'], ['summer', 'spring']),
+  n('blackcurrant', 'Blackcurrant', 'top', 'fresh', 'Dark berry with a green, almost catty leaf edge that reads modern and fruity.', 10, '#5A2060', [6, 6, 2, 6, 3, 6, 6], ['day', 'evening'], ['spring', 'summer', 'autumn']),
+  n('pear', 'Bartlett Pear', 'top', 'fresh', 'Crisp watery fruit — transparent sweetness with a pale floral halo.', 7, '#C8D848', [7, 6, 1, 4, 2, 4, 2], ['day', 'office'], ['spring', 'summer']),
+  n('peach', 'White Peach', 'top', 'gourmand', 'Velvety orchard fruit, lactonic and sun-warmed rather than candy-sweet.', 8, '#F4A878', [5, 7, 4, 5, 3, 5, 2], ['day', 'date'], ['summer', 'autumn']),
+  n('raspberry', 'Raspberry', 'top', 'gourmand', 'Tart-sweet red berry with a juicy sparkle and a faint green leaf.', 8, '#D02850', [6, 7, 2, 5, 2, 5, 3], ['day', 'date'], ['spring', 'summer']),
+  n('strawberry', 'Wild Strawberry', 'top', 'gourmand', 'Ripe red fruit with a green calyx freshness and a jammy heart.', 7, '#E03840', [6, 8, 2, 4, 2, 5, 3], ['day'], ['spring', 'summer']),
+  n('lychee', 'Lychee', 'top', 'floral', 'Translucent tropical fruit that sits between rose petal and sweet water.', 11, '#F0B8C8', [7, 7, 2, 5, 3, 5, 4], ['day', 'date'], ['spring', 'summer']),
+  n('pink-pepper', 'Pink Pepper', 'top', 'spicy', 'A crackling rosy spice that adds lift and fizzing sophistication.', 11, '#D45060', [6, 2, 5, 6, 3, 7, 4], ['evening', 'date'], ['autumn', 'spring']),
+  n('cardamom', 'Cardamom', 'top', 'spicy', 'Cool green spice with a gentle balsamic warmth. Aromatic and uplifting.', 12, '#8A9A50', [6, 3, 6, 5, 4, 5, 4], ['office', 'evening'], ['autumn', 'winter']),
+  n('black-pepper', 'Black Pepper', 'top', 'spicy', 'Dry, pungent and bracing. Adds a sharp metallic edge to any opening.', 10, '#5A5050', [5, 1, 5, 7, 3, 7, 6], ['office', 'evening'], ['autumn', 'winter']),
+  n('ginger', 'Fresh Ginger', 'top', 'spicy', 'Fiery rhizome with lemony heat and a juicy, almost soapy sparkle.', 10, '#E0B050', [7, 2, 6, 7, 3, 7, 5], ['day', 'evening'], ['autumn', 'winter', 'spring']),
+  n('coriander', 'Coriander Seed', 'top', 'spicy', 'Warm citrus-spice from crushed seed — peppery, woody and lightly floral.', 9, '#C8B070', [6, 2, 5, 5, 3, 5, 4], ['office', 'day'], ['autumn', 'spring']),
+  n('anise', 'Star Anise', 'top', 'spicy', 'Licorice-bright spice with a cool sweetness and a medicinal edge.', 9, '#8A5030', [4, 5, 5, 7, 4, 6, 7], ['evening'], ['autumn', 'winter']),
+  n('elemi', 'Elemi', 'top', 'spicy', 'Peppery lemon-resin from Manila elemi — bright incense with a pine snap.', 13, '#D8C878', [7, 2, 4, 6, 4, 6, 4], ['day', 'office'], ['spring', 'autumn']),
+  n('green-apple', 'Green Apple', 'top', 'fresh', 'Crisp, juicy orchard fruit with a playful bright-green sweetness.', 6, '#78C830', [8, 6, 1, 4, 2, 5, 3], ['day'], ['spring', 'summer']),
+  n('lavender', 'Lavender', 'top', 'fresh', 'Herbal and calming, with a clean, soft floral-aromatic undertone.', 8, '#8060B8', [8, 3, 3, 5, 4, 6, 4], ['office', 'day'], ['spring', 'summer']),
+  n('mint', 'Spearmint', 'top', 'fresh', 'Cool, crisp and reviving. A clean herbal sparkle that electrifies the opening.', 7, '#3EC880', [10, 2, 1, 6, 2, 6, 5], ['day', 'office'], ['spring', 'summer']),
+  n('petitgrain', 'Petitgrain', 'top', 'fresh', 'Woody-green distillation of bitter orange leaves. Dry, aromatic, refined.', 11, '#6A8848', [8, 1, 2, 5, 3, 5, 3], ['office', 'day'], ['spring', 'summer']),
+  n('rosemary', 'Rosemary', 'top', 'fresh', 'Camphoraceous kitchen herb — piney, medicinal and sharply aromatic.', 7, '#3A7848', [8, 1, 3, 6, 3, 6, 5], ['day', 'office'], ['spring', 'summer']),
+  n('basil', 'Sweet Basil', 'top', 'fresh', 'Green anisic herb with a peppery leaf and a hint of clove.', 8, '#48A060', [8, 2, 3, 6, 3, 6, 5], ['day'], ['spring', 'summer']),
+  n('sage', 'Clary Sage', 'top', 'fresh', 'Soft herbal-amber herb — hay, tea and a faintly nutty, musky drydown.', 10, '#7A9A58', [7, 2, 4, 5, 4, 5, 4], ['office', 'day'], ['autumn', 'spring']),
+  n('thyme', 'Thyme', 'top', 'fresh', 'Dry Mediterranean herb with thymol heat and a rustic, savory edge.', 8, '#6A8840', [7, 1, 5, 6, 3, 5, 6], ['day', 'office'], ['summer', 'autumn']),
+  n('juniper', 'Juniper Berry', 'top', 'fresh', 'Gin-like conifer berry — pine, pepper and a cold forest breeze.', 10, '#4A6848', [8, 1, 3, 6, 4, 6, 4], ['day', 'office'], ['autumn', 'winter', 'spring']),
+  n('galbanum', 'Galbanum', 'top', 'fresh', 'Bitter green resin — snapped stems, pea-pod and a sharp, elegant bite.', 14, '#6A8A30', [8, 0, 2, 8, 4, 7, 8], ['day'], ['spring', 'summer']),
+  n('aldehydes', 'Aldehydes', 'top', 'fresh', 'Soapy, fizzy sparkle that lifts florals into champagne-bright air.', 12, '#E8F0F8', [9, 2, 2, 7, 3, 8, 6], ['day', 'special'], ['spring', 'winter']),
+  n('cucumber', 'Cucumber', 'top', 'fresh', 'Cool watery green — sliced melon, dew and a clean spa-like calm.', 7, '#90D070', [10, 2, 1, 3, 2, 4, 2], ['day', 'office'], ['summer', 'spring']),
+
+  // ─── MIDDLE ─────────────────────────────────────────────────────────────
+  n('rose', 'Damask Rose', 'middle', 'floral', 'Velvety honeyed petals with a deep jammy-red heart.', 16, '#D83060', [4, 6, 4, 6, 6, 6, 3], ['date', 'special'], ['spring', 'autumn']),
+  n('jasmine', 'Jasmine Sambac', 'middle', 'floral', 'Lush heady white flower with indolic depth and creamy warmth.', 18, '#F0D870', [3, 6, 5, 8, 6, 8, 5], ['evening', 'date'], ['spring', 'summer']),
+  n('iris', 'Orris Iris', 'middle', 'floral', 'Cool, powdery and elegant — like violet, suede and soft wood.', 22, '#9080B0', [4, 3, 3, 4, 6, 4, 6], ['office', 'special'], ['autumn', 'spring']),
+  n('orange-blossom', 'Orange Blossom', 'middle', 'floral', 'Sunny honeyed petals with a luminous citrus-floral glow.', 14, '#F0C050', [6, 6, 3, 6, 5, 7, 3], ['day', 'date'], ['spring', 'summer']),
+  n('tuberose', 'Tuberose', 'middle', 'floral', 'Richly narcotic white floral — creamy, honeyed, and intensely feminine.', 20, '#F8F0D8', [2, 7, 5, 9, 7, 9, 7], ['evening', 'special', 'date'], ['summer', 'spring']),
+  n('muguet', 'Lily of the Valley', 'middle', 'floral', 'Delicate, dewy, and transparent. The freshest of all white flowers.', 15, '#C8E8C0', [8, 4, 2, 5, 4, 5, 3], ['day', 'office'], ['spring']),
+  n('ylang-ylang', 'Ylang-Ylang', 'middle', 'floral', 'Banana-cream white flower from the Cananga tree — lush, tropical and slightly spicy.', 15, '#F0D040', [3, 7, 6, 7, 6, 7, 5], ['evening', 'date'], ['summer', 'spring']),
+  n('peony', 'Peony', 'middle', 'floral', 'Airy rose-adjacent bloom — dewy, lipstick-soft and lightly peppered.', 13, '#F0A0B8', [6, 5, 3, 5, 4, 5, 2], ['day', 'date'], ['spring']),
+  n('violet', 'Violet Leaf', 'middle', 'floral', 'Powdery purple petal over a green, cucumber-leaf coolness.', 14, '#7060A8', [6, 4, 3, 5, 5, 5, 4], ['day', 'office'], ['spring', 'autumn']),
+  n('geranium', 'Rose Geranium', 'middle', 'floral', 'Minty rose-leaf geranium — green, rosy and slightly mint-camphor.', 11, '#D06078', [6, 4, 4, 6, 5, 6, 4], ['day', 'office'], ['spring', 'summer']),
+  n('osmanthus', 'Osmanthus', 'middle', 'floral', 'Apricot-suede blossom — honeyed fruit wrapped in a leathery floral.', 17, '#E8A040', [4, 7, 5, 6, 6, 6, 4], ['date', 'evening'], ['autumn', 'spring']),
+  n('gardenia', 'Gardenia', 'middle', 'floral', 'Creamy white tropical bloom with mushroom-green depth under the petals.', 18, '#F4E8C8', [3, 6, 5, 8, 6, 7, 6], ['evening', 'date'], ['summer', 'spring']),
+  n('magnolia', 'Magnolia', 'middle', 'floral', 'Lemon-cream petals with a watery, almost aquatic floral calm.', 14, '#F0E8D8', [6, 5, 3, 5, 5, 5, 3], ['day', 'date'], ['spring', 'summer']),
+  n('freesia', 'Freesia', 'middle', 'floral', 'Peppery spring flower — light, soapy-clean and slightly citrus.', 12, '#F0D070', [7, 4, 2, 5, 4, 5, 2], ['day', 'office'], ['spring']),
+  n('lilac', 'Lilac', 'middle', 'floral', 'Powdery purple cluster with a green stem and a nostalgic spring air.', 12, '#C090D0', [6, 5, 3, 5, 4, 5, 3], ['day'], ['spring']),
+  n('carnation', 'Carnation', 'middle', 'floral', 'Clove-spiced pink — peppery petals with a vintage, powdery warmth.', 11, '#E05070', [3, 5, 6, 6, 5, 6, 5], ['evening', 'date'], ['autumn', 'winter']),
+  n('heliotrope', 'Heliotrope', 'middle', 'floral', 'Cherry-almond powder flower — marzipan, vanilla and a soft heliotropin haze.', 13, '#C080C0', [3, 7, 5, 5, 6, 4, 4], ['evening', 'date'], ['autumn', 'winter']),
+  n('champaca', 'Champaca', 'middle', 'floral', 'Sacred orange-gold bloom — tea, apricot and a creamy indolic warmth.', 18, '#E89830', [3, 6, 6, 7, 6, 7, 5], ['evening', 'special'], ['summer', 'autumn']),
+  n('tiare', 'Tiaré', 'middle', 'floral', 'Tahitian gardenia — coconut-cream petals and a sun-warmed tropical heart.', 16, '#F8F0E0', [4, 7, 5, 6, 5, 6, 4], ['day', 'date'], ['summer']),
+  n('orchid', 'Orchid', 'middle', 'floral', 'Waxy exotic bloom — vanilla, powder and a quiet, expensive softness.', 15, '#D890B8', [4, 6, 4, 5, 5, 4, 3], ['date', 'special'], ['spring', 'autumn']),
+  n('cyclamen', 'Cyclamen', 'middle', 'floral', 'Cool alpine flower — watery, ozonic and lightly peppered pink.', 12, '#E8A0C0', [7, 4, 2, 4, 4, 5, 3], ['day', 'office'], ['spring']),
+  n('honeysuckle', 'Honeysuckle', 'middle', 'floral', 'Nectar-sweet vine flower with a green stem and a golden dusk glow.', 12, '#F0D860', [5, 7, 4, 5, 4, 5, 3], ['day', 'date'], ['spring', 'summer']),
+  n('frangipani', 'Frangipani', 'middle', 'floral', 'Tropical Plumeria — creamy banana-petal sweetness with a salty skin warmth.', 15, '#F0C890', [4, 7, 5, 6, 5, 6, 4], ['evening', 'date'], ['summer']),
+  n('mimosa', 'Mimosa', 'middle', 'floral', 'Sunny yellow puffball — honey, cucumber-green and a powdery spring cheer.', 13, '#F0D030', [6, 6, 3, 5, 4, 5, 2], ['day'], ['spring']),
+  n('wisteria', 'Wisteria', 'middle', 'floral', 'Hanging purple racemes — grape-floral, green and slightly powdery.', 12, '#A080C8', [6, 5, 3, 5, 4, 5, 3], ['day', 'date'], ['spring']),
+  n('cinnamon', 'Ceylon Cinnamon', 'middle', 'spicy', 'Hot sweet bark glowing with festive warmth and woody depth.', 10, '#C04818', [1, 5, 9, 7, 6, 6, 6], ['evening'], ['autumn', 'winter']),
+  n('clove', 'Clove', 'middle', 'spicy', 'Intensely warm, pungent eugenol spice with a dark, medicinal edge.', 9, '#8A2818', [1, 3, 10, 8, 7, 7, 8], ['evening', 'special'], ['autumn', 'winter']),
+  n('nutmeg', 'Nutmeg', 'middle', 'spicy', 'Warm, nutty and slightly sweet. A kitchen spice made sophisticated.', 10, '#B07840', [2, 4, 8, 6, 5, 5, 5], ['evening', 'date'], ['autumn', 'winter']),
+  n('saffron', 'Saffron', 'middle', 'spicy', 'Precious red stigma — leathery, hay-like, honeyed and faintly metallic.', 19, '#D06020', [3, 4, 7, 7, 7, 6, 6], ['evening', 'special'], ['autumn', 'winter']),
+  n('pimento', 'Allspice', 'middle', 'spicy', 'Jamaican pimento berry — clove, cinnamon and nutmeg in one warm spark.', 9, '#8A4828', [2, 4, 8, 6, 5, 5, 5], ['evening'], ['autumn', 'winter']),
+  n('cumin', 'Cumin', 'middle', 'spicy', 'Earthy seed spice with a warm, skin-like, slightly animalic heat.', 9, '#B88840', [2, 2, 8, 7, 6, 6, 8], ['evening', 'date'], ['autumn', 'winter']),
+  n('sea-salt', 'Sea Salt', 'middle', 'fresh', 'Mineral, airy and coastal. Like skin after a long swim.', 9, '#40B8D0', [9, 1, 1, 4, 4, 5, 4], ['day', 'office'], ['summer', 'spring']),
+  n('water-lotus', 'Water Lotus', 'middle', 'fresh', 'Cool aquatic floral — the scent of lotus rising from a clear lake.', 13, '#78A8D8', [8, 3, 2, 5, 5, 6, 4], ['day', 'office'], ['spring', 'summer']),
+  n('fig', 'Fig Leaf', 'middle', 'fresh', 'Milky green fig — coconut-lactone, crushed leaf and a shady garden warmth.', 13, '#6A9848', [6, 5, 4, 5, 5, 5, 4], ['day', 'date'], ['summer', 'autumn']),
+  n('tea', 'Black Tea', 'middle', 'fresh', 'Dried camellia leaf — tannic, smoky-honey and quietly aromatic.', 11, '#8A6030', [6, 3, 5, 5, 5, 4, 3], ['office', 'day'], ['autumn', 'spring']),
+  n('hyacinth', 'Hyacinth', 'middle', 'floral', 'Heady spring spike — green, soapy-floral and intensely dewy.', 12, '#90A0D8', [7, 4, 2, 7, 4, 7, 6], ['day'], ['spring']),
+  n('mate', 'Yerba Mate', 'middle', 'fresh', 'Toasted South American leaf — green, hay-like and gently bitter.', 11, '#6A8038', [6, 2, 4, 5, 5, 4, 5], ['day', 'office'], ['summer', 'autumn']),
+  n('ivy', 'Ivy', 'middle', 'fresh', 'Crushed evergreen vine — bitter green, damp stone and forest shade.', 10, '#3A7848', [8, 1, 2, 5, 4, 5, 4], ['day'], ['spring', 'summer']),
+  n('tomato-leaf', 'Tomato Leaf', 'middle', 'fresh', 'Sappy garden green — stem, sun-warmed vine and a sharp vegetal snap.', 10, '#68A040', [8, 1, 3, 6, 4, 6, 6], ['day'], ['summer', 'spring']),
+
+  // ─── BASE ───────────────────────────────────────────────────────────────
+  n('vanilla', 'Madagascar Vanilla', 'base', 'gourmand', 'Creamy, rich and comforting with a dark boozy vanilla-bean depth.', 12, '#D4A030', [1, 9, 7, 5, 8, 5, 2], ['evening', 'date'], ['autumn', 'winter']),
+  n('tonka', 'Tonka Bean', 'base', 'gourmand', 'Coumarin-rich — almond, hay and caramel with a soft smoky sweetness.', 11, '#C07028', [1, 8, 7, 5, 8, 5, 3], ['evening', 'date'], ['autumn', 'winter']),
+  n('benzoin', 'Benzoin Resin', 'base', 'gourmand', 'Sweet balsamic resin — like warm vanilla-caramel with a powdery haze.', 13, '#B88030', [1, 7, 8, 6, 9, 6, 3], ['evening', 'special'], ['autumn', 'winter']),
+  n('caramel', 'Salted Caramel', 'base', 'gourmand', 'Rich, dark burnt sugar with a contrasting salt mineral edge.', 10, '#C06020', [0, 10, 7, 5, 7, 5, 4], ['evening', 'date'], ['autumn', 'winter']),
+  n('coconut', 'Coconut', 'base', 'gourmand', 'Creamy tropical nut — suntan oil, milk and a soft lactonic warmth.', 8, '#F0E0C0', [3, 8, 6, 4, 6, 4, 3], ['day', 'date'], ['summer']),
+  n('cacao', 'Cacao', 'base', 'gourmand', 'Bitter dark chocolate bean — dusty, roasted and only faintly sweet.', 12, '#5A3020', [1, 5, 7, 6, 8, 5, 4], ['evening', 'date'], ['autumn', 'winter']),
+  n('coffee', 'Roasted Coffee', 'base', 'gourmand', 'Fresh-ground espresso — smoky roast, caramel crust and bitter depth.', 11, '#3A2418', [2, 4, 7, 7, 7, 6, 5], ['evening', 'date'], ['autumn', 'winter']),
+  n('honey', 'Orange Blossom Honey', 'base', 'gourmand', 'Warm golden nectar — beeswax, pollen and a floral, sticky sweetness.', 11, '#D4A018', [2, 9, 6, 5, 7, 5, 3], ['date', 'evening'], ['autumn', 'spring']),
+  n('praline', 'Praline', 'base', 'gourmand', 'Caramelized hazelnut sugar — toasted nut, burnt sugar and cream.', 10, '#C08038', [1, 9, 7, 5, 7, 5, 3], ['evening', 'date'], ['autumn', 'winter']),
+  n('almond', 'Bitter Almond', 'base', 'gourmand', 'Marzipan kernel — cherry-pit, heliotropin and a powdery pastry warmth.', 9, '#E0C890', [2, 7, 5, 5, 6, 4, 4], ['evening', 'date'], ['autumn', 'winter']),
+  n('chocolate', 'Dark Chocolate', 'base', 'gourmand', 'Melted cocoa mass — bitter ganache with a velvety, edible richness.', 11, '#4A2818', [1, 6, 7, 6, 7, 5, 3], ['evening', 'date'], ['autumn', 'winter']),
+  n('maple', 'Maple Syrup', 'base', 'gourmand', 'Boiled sap sweetness — wood, caramel and a breakfast-warm glow.', 9, '#C06018', [1, 9, 7, 5, 6, 4, 3], ['evening'], ['autumn', 'winter']),
+  n('pistachio', 'Pistachio', 'base', 'gourmand', 'Green nut paste — fatty, slightly savory and softly sweet.', 10, '#A0B050', [3, 6, 5, 4, 6, 4, 3], ['day', 'date'], ['spring', 'autumn']),
+  n('rum', 'Dark Rum', 'base', 'gourmand', 'Molasses spirit — boozy vanilla, oak barrel and a tropical warmth.', 10, '#8A4018', [2, 6, 8, 6, 6, 6, 5], ['evening', 'date'], ['autumn', 'winter']),
+  n('oud', 'Smoked Oud', 'base', 'woody', 'Dark resinous agarwood — the most precious and complex of all bases.', 24, '#3A1808', [1, 2, 8, 10, 10, 9, 9], ['evening', 'special'], ['winter', 'autumn']),
+  n('sandalwood', 'Sandalwood', 'base', 'woody', 'Creamy milky wood with a smooth meditative depth that lasts all day.', 18, '#C89058', [2, 4, 7, 5, 9, 5, 2], ['office', 'evening', 'date'], ['autumn', 'winter', 'spring']),
+  n('cedarwood', 'Atlas Cedarwood', 'base', 'woody', 'Dry pencil-shaving cedar with a clean, upright, structured aroma.', 10, '#A87040', [4, 1, 5, 5, 8, 5, 2], ['office', 'day'], ['autumn', 'spring']),
+  n('vetiver', 'Haitian Vetiver', 'base', 'woody', 'Smoky, earthy grass root — raw, complex, with bitter-green depth.', 16, '#5A6830', [3, 1, 5, 8, 10, 7, 7], ['office', 'evening'], ['autumn', 'summer']),
+  n('patchouli', 'Patchouli', 'base', 'woody', 'Earthy, dark and slightly chocolatey with a raw, earthy tenacity.', 9, '#5A4820', [2, 2, 6, 8, 9, 7, 7], ['evening'], ['autumn', 'winter']),
+  n('guaiac', 'Guaiac Wood', 'base', 'woody', 'Smoky tea-rose wood — dry, slightly medicinal and quietly sweet.', 14, '#8A6040', [2, 3, 6, 6, 8, 5, 4], ['evening', 'office'], ['autumn', 'winter']),
+  n('cashmeran', 'Cashmeran', 'base', 'woody', 'Musky cedar-spice molecule — cashmere, pine and a velvety skin warmth.', 16, '#C8B090', [3, 3, 6, 5, 9, 6, 3], ['day', 'evening', 'date'], ['autumn', 'winter', 'spring']),
+  n('birch', 'Birch Tar', 'base', 'woody', 'Smoked leather-wood — campfire, phenol and a rugged, tarry depth.', 13, '#4A3828', [2, 1, 6, 8, 8, 7, 8], ['evening'], ['autumn', 'winter']),
+  n('pine', 'Scotch Pine', 'base', 'woody', 'Needle-green conifer — resin, forest air and a cold, clean wood.', 8, '#3A6840', [7, 1, 4, 6, 7, 6, 4], ['day', 'office'], ['winter', 'autumn']),
+  n('oakmoss', 'Oakmoss', 'base', 'woody', 'Forest lichen — damp bark, earth and the backbone of classic chypres.', 15, '#4A5830', [3, 1, 5, 7, 9, 6, 6], ['evening', 'office'], ['autumn', 'spring']),
+  n('iso-e-super', 'Iso E Super', 'base', 'woody', 'Transparent cedar-velvet molecule — airy, woody and strangely addictive.', 14, '#C8C0B0', [4, 2, 5, 4, 9, 7, 3], ['day', 'office', 'evening'], ['spring', 'autumn', 'winter']),
+  n('cypress', 'Cypress', 'base', 'woody', 'Mediterranean conifer — dry, incense-green and slightly lemony.', 10, '#4A7050', [6, 1, 4, 5, 7, 5, 3], ['day', 'office'], ['autumn', 'spring']),
+  n('palo-santo', 'Palo Santo', 'base', 'woody', 'Holy wood smoke — citrus-resin, minty incense and a sweet, dry trail.', 15, '#C8A060', [4, 3, 6, 6, 8, 6, 4], ['evening', 'special'], ['autumn', 'winter']),
+  n('papyrus', 'Papyrus', 'base', 'woody', 'Dry river reed — dusty, slightly smoky and quietly green-woody.', 12, '#A09060', [4, 1, 5, 5, 7, 4, 4], ['office', 'day'], ['autumn', 'spring']),
+  n('hay', 'Hay', 'base', 'woody', 'Sun-dried grass — coumarin, tobacco leaf and a rural, golden sweetness.', 9, '#C8B050', [4, 4, 6, 4, 6, 4, 3], ['day', 'evening'], ['autumn', 'summer']),
+  n('amber', 'Golden Amber', 'base', 'amber', 'Warm resinous glow with honeyed labdanum and cistus warmth.', 13, '#D07818', [1, 6, 9, 7, 9, 7, 3], ['evening', 'special'], ['winter', 'autumn']),
+  n('labdanum', 'Labdanum', 'base', 'amber', 'Dark resinous cistus — the heart of oriental amber. Deep, animalic, ancient.', 16, '#A05020', [0, 4, 10, 8, 10, 8, 6], ['evening', 'special'], ['winter']),
+  n('frankincense', 'Frankincense', 'base', 'amber', 'Sacred resin — incense-like, slightly lemony, meditative and complex.', 17, '#C0A860', [3, 2, 7, 7, 9, 7, 5], ['evening', 'special'], ['winter', 'autumn']),
+  n('myrrh', 'Myrrh', 'base', 'amber', 'Bitter sacred gum — medicinal, licorice-dark and deeply incense-like.', 16, '#8A6030', [2, 3, 8, 7, 9, 6, 6], ['evening', 'special'], ['winter', 'autumn']),
+  n('ambergris', 'Ambergris', 'base', 'amber', 'Marine amber — salty, animalic-sweet, sun-warmed driftwood on skin.', 22, '#C8B898', [4, 3, 6, 5, 10, 6, 5], ['evening', 'date'], ['autumn', 'summer']),
+  n('opoponax', 'Opoponax', 'base', 'amber', 'Sweet myrrh — balsamic, honeyed incense with a softer, rounder resin.', 15, '#B07030', [2, 5, 8, 6, 9, 6, 4], ['evening', 'special'], ['autumn', 'winter']),
+  n('styrax', 'Styrax', 'base', 'amber', 'Leathery balsam — cinnamon-incense, plastic-sweet and faintly smoky.', 14, '#A07040', [2, 4, 7, 7, 8, 6, 6], ['evening'], ['autumn', 'winter']),
+  n('peru-balsam', 'Peru Balsam', 'base', 'amber', 'Vanilla-cinnamon balsam from Myroxylon — sweet, woody and medicinal.', 13, '#A06028', [1, 6, 8, 6, 8, 5, 4], ['evening', 'date'], ['autumn', 'winter']),
+  n('immortelle', 'Immortelle', 'base', 'amber', 'Curry-maple everlasting flower — honey, hay and a savory, sun-baked spice.', 16, '#D08030', [3, 6, 8, 7, 8, 6, 7], ['evening', 'special'], ['autumn', 'winter']),
+  n('tobacco', 'Tobacco Leaf', 'base', 'amber', 'Cured leaf — sweet hay, honey, smoke and a plush, wearable warmth.', 14, '#8A5030', [2, 5, 8, 6, 8, 6, 5], ['evening', 'date'], ['autumn', 'winter']),
+  n('leather', 'Leather', 'base', 'woody', 'Tanned hide accord — smoky, animalic, birch-tar and polished saddle.', 15, '#6A3828', [2, 1, 7, 7, 8, 6, 7], ['evening', 'special'], ['autumn', 'winter']),
+  n('suede', 'Suede', 'base', 'woody', 'Softer leather — iris-powder, skin and a quiet, expensive nap.', 14, '#C0A088', [3, 3, 6, 4, 8, 4, 4], ['office', 'evening', 'date'], ['autumn', 'spring']),
+  n('musk', 'White Musk', 'base', 'fresh', 'Soft, clean and skin-like. A quiet intimate second skin.', 8, '#C8B8C8', [5, 4, 4, 3, 8, 4, 1], ['day', 'office', 'date'], ['spring', 'summer', 'autumn', 'winter']),
+  n('ambroxan', 'Ambroxan', 'base', 'fresh', 'Ambergris-derived synthetic — clean, skin-close, radiantly warm and magnetic.', 19, '#A8C0C8', [4, 2, 5, 6, 10, 8, 4], ['day', 'evening', 'date'], ['spring', 'summer', 'autumn', 'winter']),
+  n('beeswax', 'Beeswax', 'base', 'gourmand', 'Warm honeycomb — pollen, honey and a faintly animalic candle glow.', 12, '#E0B040', [2, 6, 6, 4, 8, 4, 3], ['evening', 'date'], ['autumn', 'winter']),
+]
+
+const imagesById: Record<string, string> = Object.fromEntries(
+  notesImages.notes.map((entry) => [entry.id, entry.image]),
+)
+
+export const NOTES: FragranceNote[] = catalogue.map((note) => {
+  const image = imagesById[note.id]
+  if (!image) {
+    throw new Error(`Missing Wikimedia image URL for note "${note.id}"`)
+  }
+  return { ...note, image }
+})

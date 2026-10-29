@@ -1,0 +1,1333 @@
+{
+  "meta": {
+    "name": "ScentBuild Studio \u2014 Perfume Note Image Catalogue",
+    "version": 2,
+    "generatedAt": "2026-10-29",
+    "description": "Curated catalogue of all fragrance notes used in the app (matching the ids in data/notes.ts) with free, direct image URLs from Wikimedia Commons.",
+    "source": "Wikimedia Commons \u2014 free public images (public domain or Creative Commons licensed)",
+    "licenseNote": "Individual files carry their own public-domain / CC-BY / CC-BY-SA license. The commonsFile field identifies each file for license review and attribution pages at https://commons.wikimedia.org/wiki/File:<commonsFile>",
+    "usage": "Point each note's FragranceNote.image at the image URL. Works out of the box since next.config.mjs sets images.unoptimized=true."
+  },
+  "notes": [
+    {
+      "id": "bergamot",
+      "name": "Bergamot",
+      "layer": "top",
+      "family": "citrus",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/87/Bergamot_orange_-_whole_and_slice.jpg/960px-Bergamot_orange_-_whole_and_slice.jpg",
+      "source": {
+        "wikipedia": "Bergamot orange",
+        "commonsFile": "Bergamot orange - whole and slice.jpg"
+      }
+    },
+    {
+      "id": "lemon",
+      "name": "Sicilian Lemon",
+      "layer": "top",
+      "family": "citrus",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/P1030323.JPG/960px-P1030323.JPG",
+      "source": {
+        "wikipedia": "Lemon",
+        "commonsFile": "P1030323.JPG"
+      }
+    },
+    {
+      "id": "grapefruit",
+      "name": "Pink Grapefruit",
+      "layer": "top",
+      "family": "citrus",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8c/Grapefruits_-_whole-halved-segments.jpg/960px-Grapefruits_-_whole-halved-segments.jpg",
+      "source": {
+        "wikipedia": "Grapefruit",
+        "commonsFile": "Grapefruits - whole-halved-segments.jpg"
+      }
+    },
+    {
+      "id": "mandarin",
+      "name": "Mandarin Orange",
+      "layer": "top",
+      "family": "citrus",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/10/Citrus_reticulata_April_2013_Nordbaden.JPG/960px-Citrus_reticulata_April_2013_Nordbaden.JPG",
+      "source": {
+        "wikipedia": "Mandarin orange",
+        "commonsFile": "Citrus reticulata April 2013 Nordbaden.JPG"
+      }
+    },
+    {
+      "id": "yuzu",
+      "name": "Japanese Yuzu",
+      "layer": "top",
+      "family": "citrus",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Yuzu_oranges_%286459456959%29.jpg/960px-Yuzu_oranges_%286459456959%29.jpg",
+      "source": {
+        "wikipedia": "Yuzu",
+        "commonsFile": "Yuzu oranges (6459456959).jpg"
+      }
+    },
+    {
+      "id": "lime",
+      "name": "Persian Lime",
+      "layer": "top",
+      "family": "citrus",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fa/The_acid_lime_fruit_in_Hawaii_%281923%29_%2816150553543%29.jpg/960px-The_acid_lime_fruit_in_Hawaii_%281923%29_%2816150553543%29.jpg",
+      "source": {
+        "wikipedia": "lime fruit citrus",
+        "commonsFile": "The acid lime fruit in Hawaii (1923) (16150553543).jpg"
+      }
+    },
+    {
+      "id": "neroli",
+      "name": "Neroli",
+      "layer": "top",
+      "family": "citrus",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/5/57/Citrus_aurantium_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-042.jpg",
+      "source": {
+        "wikipedia": "Neroli",
+        "commonsFile": "Citrus_aurantium_-_K\u00f6hler\u2013s_Medizinal-Pflanzen-042.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+      }
+    },
+    {
+      "id": "bitter-orange",
+      "name": "Bitter Orange",
+      "layer": "top",
+      "family": "citrus",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/Citrus_aurantium.jpg/960px-Citrus_aurantium.jpg",
+      "source": {
+        "wikipedia": "Bitter orange",
+        "commonsFile": "Citrus_aurantium.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+      }
+    },
+    {
+      "id": "blood-orange",
+      "name": "Blood Orange",
+      "layer": "top",
+      "family": "citrus",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/BloodOrange.jpg/960px-BloodOrange.jpg",
+      "source": {
+        "wikipedia": "Blood orange",
+        "commonsFile": "BloodOrange.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+      }
+    },
+    {
+      "id": "citron",
+      "name": "Citron",
+      "layer": "top",
+      "family": "citrus",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/Chinesische_Zedrat_Zitrone.jpg/960px-Chinesische_Zedrat_Zitrone.jpg",
+      "source": {
+        "wikipedia": "Citron",
+        "commonsFile": "Chinesische_Zedrat_Zitrone.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+      }
+    },
+    {
+      "id": "lemon-verbena",
+      "name": "Lemon Verbena",
+      "layer": "top",
+      "family": "citrus",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Aloysia_citriodora_002.jpg/960px-Aloysia_citriodora_002.jpg",
+      "source": {
+        "wikipedia": "Aloysia citrodora",
+        "commonsFile": "Aloysia_citriodora_002.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+      }
+    },
+    {
+      "id": "pineapple",
+      "name": "Pineapple",
+      "layer": "top",
+      "family": "fresh",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/%E0%B4%95%E0%B5%88%E0%B4%A4%E0%B4%9A%E0%B5%8D%E0%B4%9A%E0%B4%95%E0%B5%8D%E0%B4%95.jpg/960px-%E0%B4%95%E0%B5%88%E0%B4%A4%E0%B4%9A%E0%B5%8D%E0%B4%9A%E0%B4%95%E0%B5%8D%E0%B4%95.jpg",
+      "source": {
+        "wikipedia": "pineapple fruit",
+        "commonsFile": "\u0d15\u0d48\u0d24\u0d1a\u0d4d\u0d1a\u0d15\u0d4d\u0d15.jpg"
+      }
+    },
+    {
+      "id": "blackcurrant",
+      "name": "Blackcurrant",
+      "layer": "top",
+      "family": "fresh",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/Ribes_nigrum_a1.JPG/960px-Ribes_nigrum_a1.JPG",
+      "source": {
+        "wikipedia": "Blackcurrant",
+        "commonsFile": "Ribes_nigrum_a1.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+      }
+    },
+    {
+      "id": "pear",
+      "name": "Bartlett Pear",
+      "layer": "top",
+      "family": "fresh",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/c/cf/Pears.jpg",
+      "source": {
+        "wikipedia": "Pear",
+        "commonsFile": "Pears.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+      }
+    },
+    {
+      "id": "peach",
+      "name": "White Peach",
+      "layer": "top",
+      "family": "gourmand",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/Autumn_Red_peaches.jpg/960px-Autumn_Red_peaches.jpg",
+      "source": {
+        "wikipedia": "peach fruit",
+        "commonsFile": "Autumn Red peaches.jpg"
+      }
+    },
+    {
+      "id": "raspberry",
+      "name": "Raspberry",
+      "layer": "top",
+      "family": "gourmand",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/a/a2/Raspberries_%28Rubus_Idaeus%29.jpg",
+      "source": {
+        "wikipedia": "raspberry fruit",
+        "commonsFile": "Raspberries (Rubus Idaeus).jpg"
+      }
+    },
+    {
+      "id": "strawberry",
+      "name": "Wild Strawberry",
+      "layer": "top",
+      "family": "gourmand",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/Strawberries.jpg/960px-Strawberries.jpg",
+      "source": {
+        "wikipedia": "Strawberry",
+        "commonsFile": "Strawberries.jpg"
+      }
+    },
+    {
+      "id": "lychee",
+      "name": "Lychee",
+      "layer": "top",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Lychee_fruits_and_seed.jpg/960px-Lychee_fruits_and_seed.jpg",
+      "source": {
+        "wikipedia": "lychee fruit",
+        "commonsFile": "Lychee fruits and seed.jpg"
+      }
+    },
+    {
+      "id": "pink-pepper",
+      "name": "Pink Pepper",
+      "layer": "top",
+      "family": "spicy",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/58/Schinus_Molle.jpg/960px-Schinus_Molle.jpg",
+      "source": {
+        "wikipedia": "Schinus molle (Peruvian pepper tree \u2014 source of pink peppercorns)",
+        "commonsFile": "Schinus Molle.jpg"
+      }
+    },
+    {
+      "id": "cardamom",
+      "name": "Cardamom",
+      "layer": "top",
+      "family": "spicy",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/02017_0119_Kardamom%2C_Winter_in_den_Beskiden.jpg/960px-02017_0119_Kardamom%2C_Winter_in_den_Beskiden.jpg",
+      "source": {
+        "wikipedia": "Cardamom",
+        "commonsFile": "02017_0119_Kardamom,_Winter_in_den_Beskiden.jpg"
+      }
+    },
+    {
+      "id": "black-pepper",
+      "name": "Black Pepper",
+      "layer": "top",
+      "family": "spicy",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Piper_nigrum_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-107.jpg",
+      "source": {
+        "wikipedia": "Black pepper",
+        "commonsFile": "Piper nigrum - K\u00f6hler\u2013s Medizinal-Pflanzen-107.jpg"
+      }
+    },
+    {
+      "id": "ginger",
+      "name": "Fresh Ginger",
+      "layer": "top",
+      "family": "spicy",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fb/Fresh_ginger_rhizome_01.jpg/960px-Fresh_ginger_rhizome_01.jpg",
+      "source": {
+        "wikipedia": "ginger rhizome",
+        "commonsFile": "Fresh ginger rhizome 01.jpg"
+      }
+    },
+    {
+      "id": "coriander",
+      "name": "Coriander Seed",
+      "layer": "top",
+      "family": "spicy",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c5/Whole_coriander_seeds_to_make_Du%27ah_%28dukkah%29.JPG/960px-Whole_coriander_seeds_to_make_Du%27ah_%28dukkah%29.JPG",
+      "source": {
+        "wikipedia": "coriander seeds",
+        "commonsFile": "Whole coriander seeds to make Du'ah (dukkah).JPG"
+      }
+    },
+    {
+      "id": "anise",
+      "name": "Star Anise",
+      "layer": "top",
+      "family": "spicy",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/35/Illicium_verum20170511_7549.jpg/960px-Illicium_verum20170511_7549.jpg",
+      "source": {
+        "wikipedia": "star anise",
+        "commonsFile": "Illicium verum20170511 7549.jpg"
+      }
+    },
+    {
+      "id": "elemi",
+      "name": "Elemi",
+      "layer": "top",
+      "family": "spicy",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Canarium_indicum_-_Icica_icicariba_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-171.jpg",
+      "source": {
+        "wikipedia": "Canarium luzonicum",
+        "commonsFile": "Canarium indicum - Icica icicariba - K\u00f6hler\u2013s Medizinal-Pflanzen-171.jpg"
+      }
+    },
+    {
+      "id": "green-apple",
+      "name": "Green Apple",
+      "layer": "top",
+      "family": "fresh",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Granny_smith_and_cross_section.jpg/960px-Granny_smith_and_cross_section.jpg",
+      "source": {
+        "wikipedia": "Granny Smith",
+        "commonsFile": "Granny smith and cross section.jpg"
+      }
+    },
+    {
+      "id": "lavender",
+      "name": "Lavender",
+      "layer": "top",
+      "family": "fresh",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Single_lavender_flower02.jpg/960px-Single_lavender_flower02.jpg",
+      "source": {
+        "wikipedia": "Lavender",
+        "commonsFile": "Single lavender flower02.jpg"
+      }
+    },
+    {
+      "id": "mint",
+      "name": "Spearmint",
+      "layer": "top",
+      "family": "fresh",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/Minze.jpg/960px-Minze.jpg",
+      "source": {
+        "wikipedia": "Spearmint",
+        "commonsFile": "Minze.jpg"
+      }
+    },
+    {
+      "id": "petitgrain",
+      "name": "Petitgrain",
+      "layer": "top",
+      "family": "fresh",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/Citrus_aurantium.jpg/960px-Citrus_aurantium.jpg",
+      "source": {
+        "wikipedia": "Bitter orange (petitgrain oil is distilled from its leaves and twigs)",
+        "commonsFile": "Citrus aurantium.jpg"
+      }
+    },
+    {
+      "id": "rosemary",
+      "name": "Rosemary",
+      "layer": "top",
+      "family": "fresh",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/0/00/Rosmarinus_officinalis_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-258.jpg",
+      "source": {
+        "wikipedia": "rosemary plant",
+        "commonsFile": "Rosmarinus officinalis - K\u00f6hler\u2013s Medizinal-Pflanzen-258.jpg"
+      }
+    },
+    {
+      "id": "basil",
+      "name": "Sweet Basil",
+      "layer": "top",
+      "family": "fresh",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/92/Basil_leaves.jpg/960px-Basil_leaves.jpg",
+      "source": {
+        "wikipedia": "basil leaves",
+        "commonsFile": "Basil leaves.jpg"
+      }
+    },
+    {
+      "id": "sage",
+      "name": "Clary Sage",
+      "layer": "top",
+      "family": "fresh",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/9/99/Salvia-sclarea-Sault.jpg",
+      "source": {
+        "wikipedia": "clary sage Salvia sclarea",
+        "commonsFile": "Salvia-sclarea-Sault.jpg"
+      }
+    },
+    {
+      "id": "thyme",
+      "name": "Thyme",
+      "layer": "top",
+      "family": "fresh",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Thymus_vulgaris_2601.JPG/960px-Thymus_vulgaris_2601.JPG",
+      "source": {
+        "wikipedia": "thyme plant",
+        "commonsFile": "Thymus vulgaris 2601.JPG"
+      }
+    },
+    {
+      "id": "juniper",
+      "name": "Juniper Berry",
+      "layer": "top",
+      "family": "fresh",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/Juniperi_pseudo-fructus_196159.jpg/960px-Juniperi_pseudo-fructus_196159.jpg",
+      "source": {
+        "wikipedia": "juniper berries",
+        "commonsFile": "Juniperi pseudo-fructus 196159.jpg"
+      }
+    },
+    {
+      "id": "galbanum",
+      "name": "Galbanum",
+      "layer": "top",
+      "family": "fresh",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Ferula_gummosa_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-205.jpg",
+      "source": {
+        "wikipedia": "galbanum ferula",
+        "commonsFile": "Ferula gummosa - K\u00f6hler\u2013s Medizinal-Pflanzen-205.jpg"
+      }
+    },
+    {
+      "id": "aldehydes",
+      "name": "Aldehydes",
+      "layer": "top",
+      "family": "fresh",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/Aldehyde_general_structure.svg/960px-Aldehyde_general_structure.svg.png",
+      "source": {
+        "wikipedia": "aldehyde structural formula",
+        "commonsFile": "Aldehyde general structure.svg"
+      }
+    },
+    {
+      "id": "cucumber",
+      "name": "Cucumber",
+      "layer": "top",
+      "family": "fresh",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/Cucumber_fruit_of_Salem.jpg/960px-Cucumber_fruit_of_Salem.jpg",
+      "source": {
+        "wikipedia": "cucumber fruit",
+        "commonsFile": "Cucumber fruit of Salem.jpg"
+      }
+    },
+    {
+      "id": "rose",
+      "name": "Damask Rose",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e2/Damask_Rose_%28154246655%29.jpeg/960px-Damask_Rose_%28154246655%29.jpeg",
+      "source": {
+        "wikipedia": "Rosa \u00d7 damascena",
+        "commonsFile": "Damask Rose (154246655).jpeg"
+      }
+    },
+    {
+      "id": "jasmine",
+      "name": "Jasmine Sambac",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/Common_Jasmine.jpg/960px-Common_Jasmine.jpg",
+      "source": {
+        "wikipedia": "Jasmine",
+        "commonsFile": "Common Jasmine.jpg"
+      }
+    },
+    {
+      "id": "iris",
+      "name": "Orris Iris",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/Iris_sanguinea_cultivar%2C_Wakehurst_Place%2C_UK_-_Diliff.jpg/960px-Iris_sanguinea_cultivar%2C_Wakehurst_Place%2C_UK_-_Diliff.jpg",
+      "source": {
+        "wikipedia": "Iris (plant) \u2014 orris root comes from Iris pallida/germanica rhizomes",
+        "commonsFile": "Iris sanguinea cultivar, Wakehurst Place, UK - Diliff.jpg"
+      }
+    },
+    {
+      "id": "orange-blossom",
+      "name": "Orange Blossom",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/Azahar_Flower.jpg/960px-Azahar_Flower.jpg",
+      "source": {
+        "wikipedia": "Orange blossom",
+        "commonsFile": "Azahar Flower.jpg"
+      }
+    },
+    {
+      "id": "tuberose",
+      "name": "Tuberose",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Tuberose_flower.jpg/960px-Tuberose_flower.jpg",
+      "source": {
+        "wikipedia": "Tuberose",
+        "commonsFile": "Tuberose flower.jpg"
+      }
+    },
+    {
+      "id": "muguet",
+      "name": "Lily of the Valley",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Convallaria_majalis_inflorescence_-_Keila.jpg/960px-Convallaria_majalis_inflorescence_-_Keila.jpg",
+      "source": {
+        "wikipedia": "Lily of the valley",
+        "commonsFile": "Convallaria majalis inflorescence - Keila.jpg"
+      }
+    },
+    {
+      "id": "ylang-ylang",
+      "name": "Ylang-Ylang",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f4/Cananga_odorata_02.JPG/960px-Cananga_odorata_02.JPG",
+      "source": {
+        "wikipedia": "Cananga odorata flower",
+        "commonsFile": "Cananga odorata 02.JPG"
+      }
+    },
+    {
+      "id": "peony",
+      "name": "Peony",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/Peony%2C_Hortus_Haren.jpg/960px-Peony%2C_Hortus_Haren.jpg",
+      "source": {
+        "wikipedia": "peony flower",
+        "commonsFile": "Peony, Hortus Haren.jpg"
+      }
+    },
+    {
+      "id": "violet",
+      "name": "Violet Leaf",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Viola_odorata_%28cleistogamous_flower%29.jpg/960px-Viola_odorata_%28cleistogamous_flower%29.jpg",
+      "source": {
+        "wikipedia": "Viola odorata flower",
+        "commonsFile": "Viola odorata (cleistogamous flower).jpg"
+      }
+    },
+    {
+      "id": "geranium",
+      "name": "Rose Geranium",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/Rose_Geranium.jpg/960px-Rose_Geranium.jpg",
+      "source": {
+        "wikipedia": "Pelargonium graveolens",
+        "commonsFile": "Rose Geranium.jpg"
+      }
+    },
+    {
+      "id": "osmanthus",
+      "name": "Osmanthus",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ae/Starr_980529-4269_Osmanthus_fragrans.jpg/960px-Starr_980529-4269_Osmanthus_fragrans.jpg",
+      "source": {
+        "wikipedia": "Osmanthus fragrans flower",
+        "commonsFile": "Starr 980529-4269 Osmanthus fragrans.jpg"
+      }
+    },
+    {
+      "id": "gardenia",
+      "name": "Gardenia",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/Gardenia_jasminoides_flower_and_bud.JPG/960px-Gardenia_jasminoides_flower_and_bud.JPG",
+      "source": {
+        "wikipedia": "Gardenia jasminoides flower",
+        "commonsFile": "Gardenia jasminoides flower and bud.JPG"
+      }
+    },
+    {
+      "id": "magnolia",
+      "name": "Magnolia",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/Magnolia_grandiflora_flower.jpg/960px-Magnolia_grandiflora_flower.jpg",
+      "source": {
+        "wikipedia": "Magnolia grandiflora",
+        "commonsFile": "Magnolia grandiflora flower.jpg"
+      }
+    },
+    {
+      "id": "freesia",
+      "name": "Freesia",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fb/Freesia_February_2013-1.jpg/960px-Freesia_February_2013-1.jpg",
+      "source": {
+        "wikipedia": "freesia flower",
+        "commonsFile": "Freesia February 2013-1.jpg"
+      }
+    },
+    {
+      "id": "lilac",
+      "name": "Lilac",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/35/Lilac_Flower%26Leaves%2C_SC%2C_Vic%2C_13.10.2007.jpg/960px-Lilac_Flower%26Leaves%2C_SC%2C_Vic%2C_13.10.2007.jpg",
+      "source": {
+        "wikipedia": "lilac flower Syringa",
+        "commonsFile": "Lilac Flower&Leaves, SC, Vic, 13.10.2007.jpg"
+      }
+    },
+    {
+      "id": "carnation",
+      "name": "Carnation",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Carnation.jpg",
+      "source": {
+        "wikipedia": "Dianthus caryophyllus",
+        "commonsFile": "Carnation.jpg"
+      }
+    },
+    {
+      "id": "heliotrope",
+      "name": "Heliotrope",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c9/Close-up_of_heliotrope_flower_%28Heliotropium_arborescens%29%2C_Jardim_da_Funda%C3%A7%C3%A3o_Calouste_Gulbenkian%2C_Lisbon%2C_Portugal_julesvernex2.jpg/960px-Close-up_of_heliotrope_flower_%28Heliotropium_arborescens%29%2C_Jardim_da_Funda%C3%A7%C3%A3o_Calouste_Gulbenkian%2C_Lisbon%2C_Portugal_julesvernex2.jpg",
+      "source": {
+        "wikipedia": "Heliotropium arborescens",
+        "commonsFile": "Close-up of heliotrope flower (Heliotropium arborescens), Jardim da Funda\u00e7\u00e3o Calouste Gulbenkian, Lisbon, Portugal julesvernex2.jpg"
+      }
+    },
+    {
+      "id": "champaca",
+      "name": "Champaca",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/20/Magnolia_champaca_flower.jpg/960px-Magnolia_champaca_flower.jpg",
+      "source": {
+        "wikipedia": "Magnolia champaca flower",
+        "commonsFile": "Magnolia champaca flower.jpg"
+      }
+    },
+    {
+      "id": "tiare",
+      "name": "Tiar\u00e9",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Gardenia_taitensis.jpg/960px-Gardenia_taitensis.jpg",
+      "source": {
+        "wikipedia": "Gardenia taitensis",
+        "commonsFile": "Gardenia taitensis.jpg"
+      }
+    },
+    {
+      "id": "orchid",
+      "name": "Orchid",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/93/Phalaenopsis.jpg/960px-Phalaenopsis.jpg",
+      "source": {
+        "wikipedia": "Phalaenopsis",
+        "commonsFile": "Phalaenopsis.jpg"
+      }
+    },
+    {
+      "id": "cyclamen",
+      "name": "Cyclamen",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/59/Cyclamen_persicum.jpg/960px-Cyclamen_persicum.jpg",
+      "source": {
+        "wikipedia": "Cyclamen persicum",
+        "commonsFile": "Cyclamen persicum.jpg"
+      }
+    },
+    {
+      "id": "honeysuckle",
+      "name": "Honeysuckle",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/3/3b/European_honeysuckle_800.jpg",
+      "source": {
+        "wikipedia": "honeysuckle flower",
+        "commonsFile": "European honeysuckle 800.jpg"
+      }
+    },
+    {
+      "id": "frangipani",
+      "name": "Frangipani",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Plumeria_obtusa.jpg",
+      "source": {
+        "wikipedia": "Plumeria",
+        "commonsFile": "Plumeria obtusa.jpg"
+      }
+    },
+    {
+      "id": "mimosa",
+      "name": "Mimosa",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8c/Acacia_dealbata_Garden_060407w.jpg/960px-Acacia_dealbata_Garden_060407w.jpg",
+      "source": {
+        "wikipedia": "Acacia dealbata mimosa",
+        "commonsFile": "Acacia dealbata Garden 060407w.jpg"
+      }
+    },
+    {
+      "id": "wisteria",
+      "name": "Wisteria",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Flowers_of_wisteria_in_Kawachi_Wisteria_Garden_20150509.JPG/960px-Flowers_of_wisteria_in_Kawachi_Wisteria_Garden_20150509.JPG",
+      "source": {
+        "wikipedia": "wisteria flower",
+        "commonsFile": "Flowers of wisteria in Kawachi Wisteria Garden 20150509.JPG"
+      }
+    },
+    {
+      "id": "cinnamon",
+      "name": "Ceylon Cinnamon",
+      "layer": "middle",
+      "family": "spicy",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/Cinnamomum_verum_spices.jpg/960px-Cinnamomum_verum_spices.jpg",
+      "source": {
+        "wikipedia": "Cinnamon",
+        "commonsFile": "Cinnamomum verum spices.jpg"
+      }
+    },
+    {
+      "id": "clove",
+      "name": "Clove",
+      "layer": "middle",
+      "family": "spicy",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/Clove_close_up.jpg/960px-Clove_close_up.jpg",
+      "source": {
+        "wikipedia": "Clove",
+        "commonsFile": "Clove close up.jpg"
+      }
+    },
+    {
+      "id": "nutmeg",
+      "name": "Nutmeg",
+      "layer": "middle",
+      "family": "spicy",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c8/Biji_Pala_Bubuk.jpg/960px-Biji_Pala_Bubuk.jpg",
+      "source": {
+        "wikipedia": "Nutmeg",
+        "commonsFile": "Biji Pala Bubuk.jpg"
+      }
+    },
+    {
+      "id": "saffron",
+      "name": "Saffron",
+      "layer": "middle",
+      "family": "spicy",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/79/Iran_saffron_threads.jpg/960px-Iran_saffron_threads.jpg",
+      "source": {
+        "wikipedia": "saffron threads",
+        "commonsFile": "Iran saffron threads.jpg"
+      }
+    },
+    {
+      "id": "pimento",
+      "name": "Allspice",
+      "layer": "middle",
+      "family": "spicy",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/WholeAllspice.JPG/960px-WholeAllspice.JPG",
+      "source": {
+        "wikipedia": "allspice berries",
+        "commonsFile": "WholeAllspice.JPG"
+      }
+    },
+    {
+      "id": "cumin",
+      "name": "Cumin",
+      "layer": "middle",
+      "family": "spicy",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/Seeds_of_Cumin.jpg/960px-Seeds_of_Cumin.jpg",
+      "source": {
+        "wikipedia": "cumin seeds",
+        "commonsFile": "Seeds of Cumin.jpg"
+      }
+    },
+    {
+      "id": "sea-salt",
+      "name": "Sea Salt",
+      "layer": "middle",
+      "family": "fresh",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c6/Dead_Sea_salt_crystals.jpg/960px-Dead_Sea_salt_crystals.jpg",
+      "source": {
+        "wikipedia": "Sea salt",
+        "commonsFile": "Dead Sea salt crystals.jpg"
+      }
+    },
+    {
+      "id": "water-lotus",
+      "name": "Water Lotus",
+      "layer": "middle",
+      "family": "fresh",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/Sacred_lotus_Nelumbo_nucifera.jpg/960px-Sacred_lotus_Nelumbo_nucifera.jpg",
+      "source": {
+        "wikipedia": "Nelumbo nucifera",
+        "commonsFile": "Sacred lotus Nelumbo nucifera.jpg"
+      }
+    },
+    {
+      "id": "fig",
+      "name": "Fig Leaf",
+      "layer": "middle",
+      "family": "fresh",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Ficus_carica_bonsai_A_D150625_fig.jpg/960px-Ficus_carica_bonsai_A_D150625_fig.jpg",
+      "source": {
+        "wikipedia": "fig fruit Ficus carica",
+        "commonsFile": "Ficus carica bonsai A D150625 fig.jpg"
+      }
+    },
+    {
+      "id": "tea",
+      "name": "Black Tea",
+      "layer": "middle",
+      "family": "fresh",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/d/d6/Camellia_sinensis_-_tea_-_from-DC1.jpg",
+      "source": {
+        "wikipedia": "tea leaves Camellia sinensis",
+        "commonsFile": "Camellia sinensis - tea - from-DC1.jpg"
+      }
+    },
+    {
+      "id": "hyacinth",
+      "name": "Hyacinth",
+      "layer": "middle",
+      "family": "floral",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bc/Hyacinthus_orientalis.jpg/960px-Hyacinthus_orientalis.jpg",
+      "source": {
+        "wikipedia": "Hyacinthus orientalis",
+        "commonsFile": "Hyacinthus orientalis.jpg"
+      }
+    },
+    {
+      "id": "mate",
+      "name": "Yerba Mate",
+      "layer": "middle",
+      "family": "fresh",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/2/28/Ilex_paraguariensis_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-074.jpg",
+      "source": {
+        "wikipedia": "Yerba mate",
+        "commonsFile": "Ilex_paraguariensis_-_K\u00f6hler\u2013s_Medizinal-Pflanzen-074.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+      }
+    },
+    {
+      "id": "ivy",
+      "name": "Ivy",
+      "layer": "middle",
+      "family": "fresh",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Hedera_algeriensis_kz01.jpg/960px-Hedera_algeriensis_kz01.jpg",
+      "source": {
+        "wikipedia": "Hedera",
+        "commonsFile": "Hedera_algeriensis_kz01.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+      }
+    },
+    {
+      "id": "tomato-leaf",
+      "name": "Tomato Leaf",
+      "layer": "middle",
+      "family": "fresh",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/Tomato_je.jpg/960px-Tomato_je.jpg",
+      "source": {
+        "wikipedia": "Tomato",
+        "commonsFile": "Tomato_je.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+      }
+    },
+    {
+      "id": "vanilla",
+      "name": "Madagascar Vanilla",
+      "layer": "base",
+      "family": "gourmand",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/Vanilla_beans.jpg/960px-Vanilla_beans.jpg",
+      "source": {
+        "wikipedia": "Vanilla planifolia",
+        "commonsFile": "Vanilla beans.jpg"
+      }
+    },
+    {
+      "id": "tonka",
+      "name": "Tonka Bean",
+      "layer": "base",
+      "family": "gourmand",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/Tonka_Beans.jpg/960px-Tonka_Beans.jpg",
+      "source": {
+        "wikipedia": "Dipteryx odorata",
+        "commonsFile": "Tonka Beans.jpg"
+      }
+    },
+    {
+      "id": "benzoin",
+      "name": "Benzoin Resin",
+      "layer": "base",
+      "family": "gourmand",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c8/Kemenyan_110112-11054_tdp.jpg/960px-Kemenyan_110112-11054_tdp.jpg",
+      "source": {
+        "wikipedia": "Benzoin resin",
+        "commonsFile": "Kemenyan 110112-11054 tdp.jpg"
+      }
+    },
+    {
+      "id": "caramel",
+      "name": "Salted Caramel",
+      "layer": "base",
+      "family": "gourmand",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/Caramel-2.jpg/960px-Caramel-2.jpg",
+      "source": {
+        "wikipedia": "Caramel",
+        "commonsFile": "Caramel-2.jpg"
+      }
+    },
+    {
+      "id": "coconut",
+      "name": "Coconut",
+      "layer": "base",
+      "family": "gourmand",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/32/Cocos_nucifera_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-187.jpg/960px-Cocos_nucifera_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-187.jpg",
+      "source": {
+        "wikipedia": "Coconut",
+        "commonsFile": "Cocos_nucifera_-_K\u00f6hler\u2013s_Medizinal-Pflanzen-187.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+      }
+    },
+    {
+      "id": "cacao",
+      "name": "Cacao",
+      "layer": "base",
+      "family": "gourmand",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Cocoa_Pods.JPG/960px-Cocoa_Pods.JPG",
+      "source": {
+        "wikipedia": "Cocoa bean",
+        "commonsFile": "Cocoa_Pods.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+      }
+    },
+    {
+      "id": "coffee",
+      "name": "Roasted Coffee",
+      "layer": "base",
+      "family": "gourmand",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c5/Roasted_coffee_beans.jpg/960px-Roasted_coffee_beans.jpg",
+      "source": {
+        "wikipedia": "Coffee bean",
+        "commonsFile": "Roasted_coffee_beans.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+      }
+    },
+    {
+      "id": "honey",
+      "name": "Orange Blossom Honey",
+      "layer": "base",
+      "family": "gourmand",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/Runny_hunny.jpg/960px-Runny_hunny.jpg",
+      "source": {
+        "wikipedia": "Honey",
+        "commonsFile": "Runny_hunny.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+      }
+    },
+    {
+      "id": "praline",
+      "name": "Praline",
+      "layer": "base",
+      "family": "gourmand",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/2/20/Pralines_cut.jpg",
+      "source": {
+        "wikipedia": "praline chocolate",
+        "commonsFile": "Pralines cut.jpg"
+      }
+    },
+    {
+      "id": "almond",
+      "name": "Bitter Almond",
+      "layer": "base",
+      "family": "gourmand",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/37/Almonds_-_in_shell%2C_shell_cracked_open%2C_shelled%2C_blanched.jpg/960px-Almonds_-_in_shell%2C_shell_cracked_open%2C_shelled%2C_blanched.jpg",
+      "source": {
+        "wikipedia": "Almond",
+        "commonsFile": "Almonds_-_in_shell,_shell_cracked_open,_shelled,_blanched.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+      }
+    },
+    {
+      "id": "chocolate",
+      "name": "Dark Chocolate",
+      "layer": "base",
+      "family": "gourmand",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/Green_and_Black%27s_dark_chocolate_bar_1.jpg/960px-Green_and_Black%27s_dark_chocolate_bar_1.jpg",
+      "source": {
+        "wikipedia": "dark chocolate bar",
+        "commonsFile": "Green and Black's dark chocolate bar 1.jpg"
+      }
+    },
+    {
+      "id": "maple",
+      "name": "Maple Syrup",
+      "layer": "base",
+      "family": "gourmand",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/1/18/Maple_syrup.jpg",
+      "source": {
+        "wikipedia": "maple syrup",
+        "commonsFile": "Maple syrup.jpg"
+      }
+    },
+    {
+      "id": "pistachio",
+      "name": "Pistachio",
+      "layer": "base",
+      "family": "gourmand",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/Pistachio_macro_whitebackground_NS.jpg/960px-Pistachio_macro_whitebackground_NS.jpg",
+      "source": {
+        "wikipedia": "pistachio nuts",
+        "commonsFile": "Pistachio macro whitebackground NS.jpg"
+      }
+    },
+    {
+      "id": "rum",
+      "name": "Dark Rum",
+      "layer": "base",
+      "family": "gourmand",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Havana_rum_barrel_proof.jpg/960px-Havana_rum_barrel_proof.jpg",
+      "source": {
+        "wikipedia": "rum barrel",
+        "commonsFile": "Havana rum barrel proof.jpg"
+      }
+    },
+    {
+      "id": "oud",
+      "name": "Smoked Oud",
+      "layer": "base",
+      "family": "woody",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Agarwood.jpg",
+      "source": {
+        "wikipedia": "Agarwood",
+        "commonsFile": "Agarwood.jpg"
+      }
+    },
+    {
+      "id": "sandalwood",
+      "name": "Sandalwood",
+      "layer": "base",
+      "family": "woody",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Santalum_album_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-128.jpg",
+      "source": {
+        "wikipedia": "Santalum album",
+        "commonsFile": "Santalum album - K\u00f6hler\u2013s Medizinal-Pflanzen-128.jpg"
+      }
+    },
+    {
+      "id": "cedarwood",
+      "name": "Atlas Cedarwood",
+      "layer": "base",
+      "family": "woody",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/View_from_the_Barouk_Forest_1.JPG/960px-View_from_the_Barouk_Forest_1.JPG",
+      "source": {
+        "wikipedia": "Cedrus (cedar forest, Barouk, Lebanon)",
+        "commonsFile": "View from the Barouk Forest 1.JPG"
+      }
+    },
+    {
+      "id": "vetiver",
+      "name": "Haitian Vetiver",
+      "layer": "base",
+      "family": "woody",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Vetiver_grass.jpg/960px-Vetiver_grass.jpg",
+      "source": {
+        "wikipedia": "Chrysopogon zizanioides",
+        "commonsFile": "Vetiver grass.jpg"
+      }
+    },
+    {
+      "id": "patchouli",
+      "name": "Patchouli",
+      "layer": "base",
+      "family": "woody",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/Pogostemon_cablin_001.jpg/960px-Pogostemon_cablin_001.jpg",
+      "source": {
+        "wikipedia": "Patchouli",
+        "commonsFile": "Pogostemon cablin 001.jpg"
+      }
+    },
+    {
+      "id": "guaiac",
+      "name": "Guaiac Wood",
+      "layer": "base",
+      "family": "woody",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/1/1d/Guaiacum_officinale_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-069.jpg",
+      "source": {
+        "wikipedia": "Guaiacum officinale",
+        "commonsFile": "Guaiacum officinale - K\u00f6hler\u2013s Medizinal-Pflanzen-069.jpg"
+      }
+    },
+    {
+      "id": "cashmeran",
+      "name": "Cashmeran",
+      "layer": "base",
+      "family": "woody",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Cashmere_Wool_Scarves.jpg",
+      "source": {
+        "wikipedia": "cashmere wool",
+        "commonsFile": "Cashmere Wool Scarves.jpg"
+      }
+    },
+    {
+      "id": "birch",
+      "name": "Birch Tar",
+      "layer": "base",
+      "family": "woody",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/Betula_pendula_bark.jpg/960px-Betula_pendula_bark.jpg",
+      "source": {
+        "wikipedia": "Birch",
+        "commonsFile": "Betula pendula bark.jpg"
+      }
+    },
+    {
+      "id": "pine",
+      "name": "Scotch Pine",
+      "layer": "base",
+      "family": "woody",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/97/Pinus_sylvestris.jpg/960px-Pinus_sylvestris.jpg",
+      "source": {
+        "wikipedia": "Pinus sylvestris",
+        "commonsFile": "Pinus sylvestris.jpg"
+      }
+    },
+    {
+      "id": "oakmoss",
+      "name": "Oakmoss",
+      "layer": "base",
+      "family": "woody",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/10/Evernia_prunastri_sw_2019.jpg/960px-Evernia_prunastri_sw_2019.jpg",
+      "source": {
+        "wikipedia": "Evernia prunastri",
+        "commonsFile": "Evernia prunastri sw 2019.jpg"
+      }
+    },
+    {
+      "id": "iso-e-super",
+      "name": "Iso E Super",
+      "layer": "base",
+      "family": "woody",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/2/23/Cedrus_wood_1.jpg",
+      "source": {
+        "wikipedia": "cedar wood",
+        "commonsFile": "Cedrus wood 1.jpg"
+      }
+    },
+    {
+      "id": "cypress",
+      "name": "Cypress",
+      "layer": "base",
+      "family": "woody",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Cypress_Halefka.JPG/960px-Cypress_Halefka.JPG",
+      "source": {
+        "wikipedia": "Cupressus sempervirens",
+        "commonsFile": "Cypress Halefka.JPG"
+      }
+    },
+    {
+      "id": "palo-santo",
+      "name": "Palo Santo",
+      "layer": "base",
+      "family": "woody",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/36/Bursera_graveolens.jpg/960px-Bursera_graveolens.jpg",
+      "source": {
+        "wikipedia": "Bursera graveolens",
+        "commonsFile": "Bursera graveolens.jpg"
+      }
+    },
+    {
+      "id": "papyrus",
+      "name": "Papyrus",
+      "layer": "base",
+      "family": "woody",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/3/33/Cyperus_papyrus6.jpg",
+      "source": {
+        "wikipedia": "Cyperus papyrus",
+        "commonsFile": "Cyperus papyrus6.jpg"
+      }
+    },
+    {
+      "id": "hay",
+      "name": "Hay",
+      "layer": "base",
+      "family": "woody",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cd/Field_of_hay_bales_-_omeo.jpg/960px-Field_of_hay_bales_-_omeo.jpg",
+      "source": {
+        "wikipedia": "hay bales",
+        "commonsFile": "Field of hay bales - omeo.jpg"
+      }
+    },
+    {
+      "id": "amber",
+      "name": "Golden Amber",
+      "layer": "base",
+      "family": "amber",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b6/Amber2.jpg/960px-Amber2.jpg",
+      "source": {
+        "wikipedia": "Amber (the perfumery accord is named after the resin/fossilized material)",
+        "commonsFile": "Amber2.jpg"
+      }
+    },
+    {
+      "id": "labdanum",
+      "name": "Labdanum",
+      "layer": "base",
+      "family": "amber",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/Cistus_April_2017-2.jpg/960px-Cistus_April_2017-2.jpg",
+      "source": {
+        "wikipedia": "Cistus ladanifer (labdanum is harvested from its sticky resin)",
+        "commonsFile": "Cistus April 2017-2.jpg"
+      }
+    },
+    {
+      "id": "frankincense",
+      "name": "Frankincense",
+      "layer": "base",
+      "family": "amber",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/14/Frankincense_2005-12-31.jpg/960px-Frankincense_2005-12-31.jpg",
+      "source": {
+        "wikipedia": "Frankincense",
+        "commonsFile": "Frankincense 2005-12-31.jpg"
+      }
+    },
+    {
+      "id": "myrrh",
+      "name": "Myrrh",
+      "layer": "base",
+      "family": "amber",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/Myrrh.JPG/960px-Myrrh.JPG",
+      "source": {
+        "wikipedia": "myrrh resin",
+        "commonsFile": "Myrrh.JPG"
+      }
+    },
+    {
+      "id": "ambergris",
+      "name": "Ambergris",
+      "layer": "base",
+      "family": "amber",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b1/Ambergris.jpg/960px-Ambergris.jpg",
+      "source": {
+        "wikipedia": "ambergris",
+        "commonsFile": "Ambergris.jpg"
+      }
+    },
+    {
+      "id": "opoponax",
+      "name": "Opoponax",
+      "layer": "base",
+      "family": "amber",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b5/Opopanax_chironium_2007-06-02_%28flower%29.jpg/960px-Opopanax_chironium_2007-06-02_%28flower%29.jpg",
+      "source": {
+        "wikipedia": "opopanax",
+        "commonsFile": "Opopanax chironium 2007-06-02 (flower).jpg"
+      }
+    },
+    {
+      "id": "styrax",
+      "name": "Styrax",
+      "layer": "base",
+      "family": "amber",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/0/07/Styrax.jpg",
+      "source": {
+        "wikipedia": "Liquidambar styrax",
+        "commonsFile": "Styrax.jpg"
+      }
+    },
+    {
+      "id": "peru-balsam",
+      "name": "Peru Balsam",
+      "layer": "base",
+      "family": "amber",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/1/15/Myroxylon_balsamum_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-140.jpg",
+      "source": {
+        "wikipedia": "Myroxylon balsamum",
+        "commonsFile": "Myroxylon balsamum - K\u00f6hler\u2013s Medizinal-Pflanzen-140.jpg"
+      }
+    },
+    {
+      "id": "immortelle",
+      "name": "Immortelle",
+      "layer": "base",
+      "family": "amber",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c5/Helichrysum_italicum_%28immortelle%29.JPG/960px-Helichrysum_italicum_%28immortelle%29.JPG",
+      "source": {
+        "wikipedia": "Helichrysum italicum",
+        "commonsFile": "Helichrysum italicum (immortelle).JPG"
+      }
+    },
+    {
+      "id": "tobacco",
+      "name": "Tobacco Leaf",
+      "layer": "base",
+      "family": "amber",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/58/Monardes_Tobacco_1574.jpg/960px-Monardes_Tobacco_1574.jpg",
+      "source": {
+        "wikipedia": "tobacco leaves",
+        "commonsFile": "Monardes Tobacco 1574.jpg"
+      }
+    },
+    {
+      "id": "leather",
+      "name": "Leather",
+      "layer": "base",
+      "family": "woody",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/Leather.jpg/960px-Leather.jpg",
+      "source": {
+        "wikipedia": "Leather",
+        "commonsFile": "Leather.jpg"
+      }
+    },
+    {
+      "id": "suede",
+      "name": "Suede",
+      "layer": "base",
+      "family": "woody",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c3/Suede_jacket.jpg/960px-Suede_jacket.jpg",
+      "source": {
+        "wikipedia": "Suede",
+        "commonsFile": "Suede jacket.jpg"
+      }
+    },
+    {
+      "id": "musk",
+      "name": "Musk",
+      "layer": "base",
+      "family": "fresh",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/Musk_deer_in_Edinburgh_Zoo.jpg/960px-Musk_deer_in_Edinburgh_Zoo.jpg",
+      "source": {
+        "wikipedia": "Musk deer (historic source; modern musk accords are synthetic)",
+        "commonsFile": "Musk deer in Edinburgh Zoo.jpg"
+      }
+    },
+    {
+      "id": "ambroxan",
+      "name": "Ambroxan",
+      "layer": "base",
+      "family": "fresh",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/Ambrox.svg/960px-Ambrox.svg.png",
+      "source": {
+        "wikipedia": "Ambroxide (molecule \u2014 no photographic subject; synthetic molecule structure shown)",
+        "commonsFile": "Ambrox.svg"
+      }
+    },
+    {
+      "id": "beeswax",
+      "name": "Beeswax",
+      "layer": "base",
+      "family": "gourmand",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6f/Burr_comb.jpg/960px-Burr_comb.jpg",
+      "source": {
+        "wikipedia": "beeswax honeycomb",
+        "commonsFile": "Burr comb.jpg"
+      }
+    }
+  ]
+}

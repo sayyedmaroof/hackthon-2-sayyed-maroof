@@ -1,5 +1,22 @@
 import { NOTES_BY_ID } from './fragrance-data'
-import type { Family, FragranceNote, Layer, Occasion, ScentAttributes, ScentProfile, Season } from './types'
+import {
+  CONCENTRATIONS,
+  blendPersistenceHours,
+  hoursToLongevityScore,
+  isFixative,
+  longevityScoreToHours,
+} from './perfumery'
+import type {
+  Concentration,
+  Family,
+  FragranceNote,
+  Layer,
+  Occasion,
+  ProfilePhase,
+  ScentAttributes,
+  ScentProfile,
+  Season,
+} from './types'
 
 const PRESENCE_WEIGHT: Record<Layer, number> = { top: 0.8, middle: 1, base: 1.2 }
 const LONGEVITY_WEIGHT: Record<Layer, number> = { top: 0.35, middle: 0.9, base: 1.6 }
@@ -70,17 +87,79 @@ export function notesFromIds(noteIds: string[]): FragranceNote[] {
 
 export const EMPTY_BLEND_COLOR = '#D8E6F2'
 
-export function computeProfile(noteIds: string[]): ScentProfile | null {
+const list = (names: string[]) =>
+  names.length <= 1 ? names.join('') : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`
+
+/**
+ * Builds the wear-curve: how the blend actually unfolds on skin, with windows
+ * calibrated to the standard olfactory pyramid (top up to ~30 min, heart
+ * ~20 min–4 h, drydown 3 h and beyond).
+ */
+function buildEvolution(notes: FragranceNote[], fixatives: string[]): ProfilePhase[] {
+  const names = (layer: Layer) => notes.filter((n) => n.layer === layer).map((n) => n.name)
+  const top = names('top')
+  const middle = names('middle')
+  const base = names('base')
+  const phases: ProfilePhase[] = []
+
+  phases.push({
+    phase: 'Opening',
+    window: '0 – 15 min',
+    description: top.length
+      ? `A bright spray of ${list(top)} — the most volatile materials rise off skin first, filling the air for 15–30 minutes before fading.`
+      : 'Without a top note the blend opens directly into its heart; nothing announces the spray itself.',
+  })
+
+  phases.push({
+    phase: 'Heart',
+    window: '20 min – 3 h',
+    description: middle.length
+      ? `As the opening burns off, the heart steps forward: ${list(middle)} shape the scent for roughly the first third of the day.`
+      : 'No true heart material is present, so the opening hands off abruptly to the drydown.',
+  })
+
+  const anchor = fixatives.length ? `, anchored by ${list(fixatives)}` : ''
+  phases.push({
+    phase: 'Drydown',
+    window: '3 h +',
+    description: base.length
+      ? `The drydown is what you wear for most of the day: ${list(base)} linger for hours${anchor}, slowing the release of everything above them.`
+      : 'Without base notes there is no drydown — the blend ends when the heart fades.',
+  })
+
+  return phases
+}
+
+/**
+ * Computes the scent profile. The optional concentration applies the real
+ * effect of dilution: EDT is lighter and radiates more, Extrait is richer,
+ * longer-lasting — but sits closer to the skin.
+ */
+export function computeProfile(
+  noteIds: string[],
+  concentration: Concentration = 'edp',
+): ScentProfile | null {
   const notes = notesFromIds(noteIds)
   if (notes.length === 0) return null
+
+  const conc = CONCENTRATIONS[concentration]
 
   const freshness = weightedAverage(notes, 'freshness', PRESENCE_WEIGHT)
   const sweetness = weightedAverage(notes, 'sweetness', PRESENCE_WEIGHT)
   const warmth = weightedAverage(notes, 'warmth', PRESENCE_WEIGHT)
-  const intensity = weightedAverage(notes, 'intensity', PRESENCE_WEIGHT)
   const polarizing = weightedAverage(notes, 'polarizing', PRESENCE_WEIGHT)
-  const longevity = weightedAverage(notes, 'longevity', LONGEVITY_WEIGHT)
-  const projection = 0.7 * weightedAverage(notes, 'projection', PRESENCE_WEIGHT) + 0.3 * intensity
+
+  // Longevity comes from a realistic persistence model (per-note hours in the
+  // published pyramid bands, plus fixative synergy and dilution), not a
+  // simple attribute average.
+  const longevity = hoursToLongevityScore(blendPersistenceHours(noteIds, concentration))
+
+  const intensity = clamp(weightedAverage(notes, 'intensity', PRESENCE_WEIGHT) * conc.intensityFactor)
+  // Extrait radiates less than EDT at equal formula — concentration shifts
+  // projection down as it shifts richness up.
+  const projection = clamp(
+    (0.7 * weightedAverage(notes, 'projection', PRESENCE_WEIGHT) + 0.3 * intensity) * conc.projectionFactor,
+  )
 
   const layers = new Set(notes.map((n) => n.layer))
   const crowdAppeal = clamp(10 - polarizing * 0.8 - Math.max(0, intensity - 7) * 0.6 + (layers.size === 3 ? 0.6 : 0))
@@ -91,7 +170,7 @@ export function computeProfile(noteIds: string[]): ScentProfile | null {
   }
   const totalFamilyWeight = [...familyWeights.values()].reduce((a, b) => a + b, 0)
   const familyMix = [...familyWeights.entries()]
-    .map(([family, weight]) => ({ family, share: weight / totalFamilyWeight }))
+    .map(([family, share]) => ({ family, share: share / totalFamilyWeight }))
     .sort((a, b) => b.share - a.share)
 
   const share = (families: Family[]) =>
@@ -111,6 +190,19 @@ export function computeProfile(noteIds: string[]): ScentProfile | null {
   const ageRange = intensity > 6.5 || polarizing > 5.5 ? '28–45' : freshness > 6.5 ? '18–35' : '22–40'
   const character: ScentProfile['character'] = polarizing >= 5.5 ? 'Bold' : polarizing >= 3.2 ? 'Balanced' : 'Safe'
 
+  // Presence-weight shares per layer — the realistic formula proportions
+  // (top ~15–30%, heart ~30–50%, base ~40–50% in a classic fine fragrance).
+  const layerWeight: Record<Layer, number> = { top: 0, middle: 0, base: 0 }
+  for (const note of notes) layerWeight[note.layer] += PRESENCE_WEIGHT[note.layer]
+  const totalLayerWeight = layerWeight.top + layerWeight.middle + layerWeight.base
+  const pyramid = {
+    top: layerWeight.top / totalLayerWeight,
+    middle: layerWeight.middle / totalLayerWeight,
+    base: layerWeight.base / totalLayerWeight,
+  }
+
+  const fixativeNames = notes.filter(isFixative).map((n) => n.name)
+
   return {
     family: familyMix[0].family,
     familyMix,
@@ -119,7 +211,7 @@ export function computeProfile(noteIds: string[]): ScentProfile | null {
     warmth: round1(warmth),
     intensity: round1(intensity),
     longevity: round1(longevity),
-    projection: round1(clamp(projection)),
+    projection: round1(projection),
     crowdAppeal: round1(crowdAppeal),
     polarizing: round1(polarizing),
     character,
@@ -129,12 +221,19 @@ export function computeProfile(noteIds: string[]): ScentProfile | null {
     genderLean,
     ageRange,
     color: blendColor(notes, warmth),
+    pyramid,
+    evolution: buildEvolution(notes, fixativeNames),
+    fixativeNames,
   }
 }
 
 export function longevityHours(score: number) {
-  if (score >= 8.5) return '8–12 h'
-  if (score >= 7) return '6–8 h'
-  if (score >= 5) return '4–6 h'
-  return '2–4 h'
+  const hours = longevityScoreToHours(score)
+  if (hours < 0.75) return '≤ 45 min'
+  if (hours < 2) return '1–2 h'
+  if (hours < 3.5) return '2–3 h'
+  if (hours < 5) return '3–5 h'
+  if (hours < 7) return '5–7 h'
+  if (hours < 9) return '7–9 h'
+  return '9–12 h'
 }
