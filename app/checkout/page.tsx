@@ -4,6 +4,16 @@ import { useEffect, useMemo, useState } from 'react'
 import { calculatePrice, formatPrice } from '@/lib/pricing'
 import { useAuth } from '@/lib/auth-store'
 import { useStudio } from '@/lib/studio-store'
+import type { ShippingAddress } from '@/lib/payments/address'
+
+const EMPTY_ADDRESS: ShippingAddress = {
+  line1: '',
+  line2: '',
+  city: '',
+  state: '',
+  postalCode: '',
+  country: '',
+}
 
 function CheckoutCanceledNotice() {
   return (
@@ -19,6 +29,7 @@ export default function CheckoutPage() {
   const { user, status } = useAuth()
   const [email, setEmail] = useState('')
   const [fullName, setFullName] = useState('')
+  const [address, setAddress] = useState<ShippingAddress>(EMPTY_ADDRESS)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [canceled, setCanceled] = useState(false)
@@ -65,6 +76,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           email,
           fullName,
+          shippingAddress: address,
           checkoutAttemptId,
           items: cart.map((item) => ({
             id: item.blend.id,
@@ -130,6 +142,37 @@ export default function CheckoutPage() {
               <span className="mb-2 block text-sm font-medium text-ink">Email</span>
               <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="w-full rounded-full border border-border bg-white px-4 py-3 text-sm outline-none transition focus:border-azure" placeholder="jane@example.com" required />
             </label>
+          </div>
+
+          <div className="mt-7 border-t border-border pt-6">
+            <h2 className="font-serif text-2xl text-ink">Shipping address</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Where should we send your custom fragrance?</p>
+            <div className="mt-5 grid gap-5 sm:grid-cols-2">
+              <label className="block sm:col-span-2">
+                <span className="mb-2 block text-sm font-medium text-ink">Street address</span>
+                <input autoComplete="address-line1" maxLength={120} value={address.line1} onChange={(event) => setAddress((current) => ({ ...current, line1: event.target.value }))} className="w-full rounded-full border border-border bg-white px-4 py-3 text-sm outline-none transition focus:border-azure" placeholder="123 Main Street" required />
+              </label>
+              <label className="block sm:col-span-2">
+                <span className="mb-2 block text-sm font-medium text-ink">Apartment, suite, etc. <span className="font-normal text-muted-foreground">(optional)</span></span>
+                <input autoComplete="address-line2" maxLength={120} value={address.line2} onChange={(event) => setAddress((current) => ({ ...current, line2: event.target.value }))} className="w-full rounded-full border border-border bg-white px-4 py-3 text-sm outline-none transition focus:border-azure" placeholder="Apartment 4B" />
+              </label>
+              <label className="block">
+                <span className="mb-2 block text-sm font-medium text-ink">City</span>
+                <input autoComplete="address-level2" maxLength={80} value={address.city} onChange={(event) => setAddress((current) => ({ ...current, city: event.target.value }))} className="w-full rounded-full border border-border bg-white px-4 py-3 text-sm outline-none transition focus:border-azure" required />
+              </label>
+              <label className="block">
+                <span className="mb-2 block text-sm font-medium text-ink">State / Region</span>
+                <input autoComplete="address-level1" maxLength={80} value={address.state} onChange={(event) => setAddress((current) => ({ ...current, state: event.target.value }))} className="w-full rounded-full border border-border bg-white px-4 py-3 text-sm outline-none transition focus:border-azure" required />
+              </label>
+              <label className="block">
+                <span className="mb-2 block text-sm font-medium text-ink">Postal code</span>
+                <input autoComplete="postal-code" maxLength={24} value={address.postalCode} onChange={(event) => setAddress((current) => ({ ...current, postalCode: event.target.value }))} className="w-full rounded-full border border-border bg-white px-4 py-3 text-sm outline-none transition focus:border-azure" required />
+              </label>
+              <label className="block">
+                <span className="mb-2 block text-sm font-medium text-ink">Country</span>
+                <input autoComplete="country-name" maxLength={80} value={address.country} onChange={(event) => setAddress((current) => ({ ...current, country: event.target.value }))} className="w-full rounded-full border border-border bg-white px-4 py-3 text-sm outline-none transition focus:border-azure" placeholder="United States" required />
+              </label>
+            </div>
           </div>
 
           {canceled && <CheckoutCanceledNotice />}

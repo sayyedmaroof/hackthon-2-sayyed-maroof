@@ -9,6 +9,7 @@ import {
   timestamp,
   uniqueIndex,
 } from 'drizzle-orm/pg-core'
+import type { ShippingAddress } from '@/lib/payments/address'
 
 /**
  * Blends (draft snapshots) are the app's own domain shape — see lib/types.ts.
@@ -132,6 +133,7 @@ export const orders = pgTable(
     userId: text('user_id').references(() => users.id, { onDelete: 'set null' }),
     customerName: text('customer_name').notNull(),
     customerEmail: text('customer_email').notNull(),
+    shippingAddress: jsonb('shipping_address').$type<ShippingAddress>(),
     lines: jsonb('lines').$type<OrderLineRecord[]>().notNull(),
     subtotalCents: integer('subtotal_cents').notNull(),
     shippingCents: integer('shipping_cents').notNull().default(0),

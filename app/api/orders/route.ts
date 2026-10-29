@@ -7,6 +7,7 @@ import {
   buildOrderLines,
   type ComputedOrderLines,
 } from '@/lib/payments/orders'
+import { parseShippingAddress } from '@/lib/payments/address'
 import { createCheckoutSessionForOrder } from '@/lib/payments/checkout'
 import {
   getStripe,
@@ -68,6 +69,10 @@ export async function POST(request: Request) {
   if (fullName.length < 2) {
     return NextResponse.json({ error: 'Please enter your full name.' }, { status: 400 })
   }
+  const shippingAddress = parseShippingAddress(data.shippingAddress)
+  if (!shippingAddress.ok) {
+    return NextResponse.json({ error: shippingAddress.error }, { status: 400 })
+  }
 
   // ── Checkout attempt identifier (drives idempotency) ──────────────────
   // The client generates one per intentional submission; a retry after a
@@ -114,6 +119,7 @@ export async function POST(request: Request) {
         userId,
         customerName: fullName,
         customerEmail: email,
+        shippingAddress: shippingAddress.value,
         lines: computed.lines,
         subtotalCents: computed.subtotalCents,
         shippingCents: computed.shippingCents,
@@ -212,6 +218,7 @@ export async function POST(request: Request) {
       orderId: orderRow.id,
       reference: orderRow.reference,
       customerEmail: email,
+      shippingAddress: shippingAddress.value,
       computed,
       generation,
     })

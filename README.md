@@ -18,7 +18,7 @@ Built with **Next.js 16** (App Router), **React 19**, **Tailwind CSS 4**,
   via Gemini, automatically falling back to Groq if unavailable.
 - **Accounts** — email + password auth with hashed (bcrypt) credentials
   and session cookies.
-- **Cart & Checkout** — full purchase flow with saved orders.
+- **Cart & Checkout** — Stripe payments with shipping addresses saved to each order.
 - **Saved blends** — persist compositions to your account.
 
 ## Getting started

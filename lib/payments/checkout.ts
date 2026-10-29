@@ -3,6 +3,7 @@ import type { OrderLineRecord } from '@/db/schema'
 import { appUrl } from '@/lib/stripe'
 import { bottleSummary } from '@/lib/pricing'
 import type { ComputedOrderLines } from '@/lib/payments/orders'
+import type { ShippingAddress } from '@/lib/payments/address'
 
 /**
  * Stripe Checkout Session orchestration.
@@ -16,6 +17,7 @@ export interface CreateSessionInput {
   orderId: string
   reference: string
   customerEmail: string
+  shippingAddress: ShippingAddress
   computed: ComputedOrderLines
   /**
    * Generation counter for checkout sessions created for this order.
@@ -66,7 +68,7 @@ function buildLineDescription(line: OrderLineRecord): string {
 export async function createCheckoutSessionForOrder(
   input: CreateSessionInput,
 ): Promise<CreateSessionResult> {
-  const { stripe, orderId, reference, customerEmail, computed, generation } = input
+  const { stripe, orderId, reference, customerEmail, shippingAddress, computed, generation } = input
 
   const idempotencyKey = `checkout:${orderId}:g${generation}`
 
@@ -82,6 +84,12 @@ export async function createCheckoutSessionForOrder(
       metadata: {
         orderId,
         orderRef: reference,
+        shipping_line1: shippingAddress.line1,
+        ...(shippingAddress.line2 ? { shipping_line2: shippingAddress.line2 } : {}),
+        shipping_city: shippingAddress.city,
+        shipping_state: shippingAddress.state,
+        shipping_postal_code: shippingAddress.postalCode,
+        shipping_country: shippingAddress.country,
       },
       payment_intent_data: {
         metadata: {
