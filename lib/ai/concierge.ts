@@ -7,14 +7,14 @@
  * deterministic `recommendBlends` path whenever a direction is invalid.
  */
 
-import { FAMILY_LABELS, NOTES_BY_ID } from '@/lib/fragrance-data'
+import { FAMILY_LABELS, NOTES, NOTES_BY_ID } from '@/lib/fragrance-data'
 import { buildTarget, recommendBlends } from '@/lib/concierge'
 import { computeProfile } from '@/lib/scoring'
-import { sanitizeNoteIds, validateBlend } from '@/lib/validation'
-import type { ConciergeInput, ConciergeRecommendation, RecommendationTier } from '@/lib/types'
+import { sanitizeNoteIds, validateAdd, validateBlend } from '@/lib/validation'
+import type { ConciergeInput, ConciergeRecommendation, RecommendationTier, ScentProfile } from '@/lib/types'
 import { getAiConfig, hasAnyProvider } from './config'
 import { generateWithFallback } from './providers'
-import { conciergeSystemPrompt, conciergeUserPrompt, type ConciergePromptInput } from './prompts'
+import { catalogAllowlist, conciergeSystemPrompt, conciergeUserPrompt, type ConciergePromptInput } from './prompts'
 import { conciergeOutputSchema } from './schemas'
 import { resolveAvoidEntries, type ResolvedAvoid } from './avoid'
 import { fetchPerfumeInspiration, isPerfumeReference, type PerfumePickRef } from './perfume-picks'
@@ -42,6 +42,45 @@ function targetSummary(input: ConciergeInput, avoid: ResolvedAvoid): string {
   return parts.join(', ')
 }
 
+function respectsExclusions(id: string, avoid: ResolvedAvoid): boolean {
+  return (
+    !avoid.noteIds.includes(id) &&
+    !avoid.families.some((family) => NOTES_BY_ID[id]?.family === family)
+  )
+}
+
+/**
+ * A compatible stand-in for a note we must remove: same layer and family first
+ * (keeps the direction's intended character), same layer second, and always a
+ * curated rule alternative before a plain sibling. Must fit the remaining notes.
+ */
+function sameFamilyAlternative(
+  victimId: string,
+  remainingIds: readonly string[],
+  alternatives: readonly string[],
+  avoid: ResolvedAvoid,
+): string | null {
+  const victim = NOTES_BY_ID[victimId]
+  if (!victim) return null
+  const remaining = [...remainingIds]
+  const evaluate = (id: string): boolean =>
+    Boolean(
+      NOTES_BY_ID[id] &&
+        !remaining.includes(id) &&
+        respectsExclusions(id, avoid) &&
+        validateAdd(remaining, id).ok,
+    )
+
+  for (const id of alternatives) if (evaluate(id)) return id
+  for (const note of NOTES) {
+    if (note.layer === victim.layer && note.family === victim.family && evaluate(note.id)) return note.id
+  }
+  for (const note of NOTES) {
+    if (note.layer === victim.layer && evaluate(note.id)) return note.id
+  }
+  return null
+}
+
 /** Enforce exclusions + clash rules on one AI-proposed direction. */
 function repairDirection(direction: { noteIds: string[] }, avoid: ResolvedAvoid): string[] {
   const allowed = sanitizeNoteIds(direction.noteIds).filter(
@@ -50,22 +89,24 @@ function repairDirection(direction: { noteIds: string[] }, avoid: ResolvedAvoid)
       !avoid.families.some((family) => NOTES_BY_ID[id]?.family === family),
   )
 
-  // Clash repair: drop the later clash partner, keep the earlier choice.
-  let check = validateBlend(allowed)
-  if (check.issues.length > 0) {
-    const drop = new Set<string>()
-    for (const issue of check.issues) {
-      const idxA = allowed.indexOf(issue.noteA.id)
-      const idxB = allowed.indexOf(issue.noteB.id)
-      drop.add(idxA <= idxB ? issue.noteB.id : issue.noteA.id)
-    }
-    const repaired = allowed.filter((id) => !drop.has(id))
-    check = validateBlend(repaired)
-    if (check.issues.length === 0 && repaired.length >= 3) return repaired
-    return []
+  // Clash resolution: substitute the later clash partner with a compatible
+  // sibling (keeps the pyramid a full one), drop it when nothing fits.
+  for (let pass = 0; pass < allowed.length; pass++) {
+    const check = validateBlend(allowed)
+    if (check.issues.length === 0) break
+    const issue = check.issues[0]
+    const idxA = allowed.indexOf(issue.noteA.id)
+    const idxB = allowed.indexOf(issue.noteB.id)
+    if (idxA < 0 || idxB < 0) break
+    const victimIdx = idxA <= idxB ? idxB : idxA
+    const victimId = allowed[victimIdx]
+    const remaining = allowed.filter((_, index) => index !== victimIdx)
+    const substitute = sameFamilyAlternative(victimId, remaining, issue.rule.alternatives[victimId] ?? [], avoid)
+    if (substitute) allowed.splice(victimIdx, 1, substitute)
+    else allowed.splice(victimIdx, 1)
   }
 
-  return allowed.length >= 3 ? allowed : []
+  return validateBlend(allowed).issues.length === 0 && allowed.length >= 3 ? allowed : []
 }
 
 function deterministicTiers(input: ConciergeInput, avoid: ResolvedAvoid): ConciergeRecommendation[] {
@@ -123,25 +164,63 @@ export async function runConciergeAI(preferences: ConciergeInput): Promise<Conci
   }
 
   // ── Validate AI directions against the real catalog ──────────────────────
+  const target = buildTarget(usablePreferences)
   const deterministic = deterministicTiers(usablePreferences, avoid)
   const deterministicByTier = new Map(deterministic.map((r) => [r.tier, r]))
   const usedSets: Set<string>[] = []
+  const seenTiers = new Set<RecommendationTier>()
 
   const recommendations: ConciergeRecommendation[] = []
   let degraded = false
 
   for (const raw of result.data.recommendations) {
     const tier = raw.tier
+    // A repeated tier is untrusted weight: only the first occurrence counts,
+    // so a hallucinated extra direction can never displace another tier.
+    if (seenTiers.has(tier)) {
+      degraded = true
+      continue
+    }
+    seenTiers.add(tier)
+
+    const proposedIds = sanitizeNoteIds(raw.noteIds)
+    const proposedNames = namesOfIds(proposedIds)
     const repairedIds = repairDirection(raw, avoid)
+    const blendCheck = validateBlend(repairedIds)
+
+    // Copy that names a material we had to drop would contradict the note
+    // chips beneath it — such a direction goes to the deterministic tier.
+    const droppedNames = proposedNames.filter((name) => !namesOfIds(repairedIds).includes(name))
+    const sanitizedSummary = sanitizeText(raw.summary, 200)
+    const sanitizedExplanation = sanitizeText(raw.explanation, 650)
+    const copyMentionsDropped =
+      droppedNames.length > 0 &&
+      (mentionsAny(sanitizedSummary, droppedNames) || mentionsAny(sanitizedExplanation, droppedNames))
+    // Same lie, subtler: text claiming a layer the blend does not actually
+    // contain (a "drydown of sandalwood" with no base note at all). Only
+    // punished together with a genuinely missing pyramid layer.
+    const copyInventsMissingLayer =
+      blendCheck.missingLayers.length > 0 &&
+      mentionsAbsentMaterial(`${sanitizedSummary} ${sanitizedExplanation}`, repairedIds)
+
     const sameAsAnother = usedSets.some(
       (set) => [...set].join('|') === [...new Set(repairedIds)].sort().join('|'),
     )
     const profile = repairedIds.length ? computeProfile(repairedIds) : null
 
-    if (!profile || reusedOutOfBounds(repairedIds, tier) || sameAsAnother || incompleteComposition(repairedIds)) {
+    if (
+      !profile ||
+      sameAsAnother ||
+      overlapsWithAnother(repairedIds, usedSets) ||
+      copyMentionsDropped ||
+      copyInventsMissingLayer ||
+      reusedOutOfBounds(repairedIds, tier) ||
+      incompleteComposition(repairedIds) ||
+      !fitsBrief(profile, tier, target)
+    ) {
       const fallbackRec = deterministicByTier.get(tier)
       if (fallbackRec) {
-        recommendations.push(applyAiCopy(fallbackRec, raw))
+        recommendations.push(applyAiCopy(fallbackRec, raw, proposedNames, namesOfIds(fallbackRec.noteIds)))
         degraded = true
         usedSets.push(new Set(fallbackRec.noteIds))
       }
@@ -153,12 +232,23 @@ export async function runConciergeAI(preferences: ConciergeInput): Promise<Conci
       name: deriveName(raw, profile),
       noteIds: repairedIds,
       family: profile.family,
-      summary: sanitizeText(raw.summary, 200),
-      explanation: sanitizeText(raw.explanation, 650),
+      summary: sanitizedSummary,
+      explanation: sanitizedExplanation,
       profile,
     }
     recommendations.push(rec)
     usedSets.push(new Set(repairedIds))
+  }
+
+  // Fill any tier the model skipped or mishandled instead of discarding the
+  // whole response — the AI directions that survived stay in the answer.
+  for (const tier of TIERS) {
+    if (recommendations.some((rec) => rec.tier === tier)) continue
+    const fallbackRec = deterministicByTier.get(tier)
+    if (fallbackRec) {
+      recommendations.push(fallbackRec)
+      degraded = true
+    }
   }
 
   return recommendations.length === 3
@@ -167,6 +257,74 @@ export async function runConciergeAI(preferences: ConciergeInput): Promise<Conci
 }
 
 const BOLD_ALLOW_MORE_POLARIZING = true
+
+/** Catalog display names for a note-ID list (unknown IDs kept verbatim). */
+function namesOfIds(ids: readonly string[]): string[] {
+  return ids.map((id) => NOTES_BY_ID[id]?.name ?? id)
+}
+
+/** True when the text still names one of the given materials. */
+function mentionsAny(text: string, names: readonly string[]): boolean {
+  const lower = text.toLowerCase()
+  return names.some((name) => lower.includes(name.toLowerCase()))
+}
+
+const CATALOG_ENTRY_TOKENS: { id: string; words: string[] }[] = catalogAllowlist().map((note) => ({
+  id: note.id,
+  words: note.name.toLowerCase().split(/[\s-]+/),
+}))
+
+/**
+ * Conservative catalog-name scan: only entries with two or more words (or a
+ * single distinctive word like "sandalwood") count, so ordinary adjectives
+ * ("rose" in "scented like a rose garden", "tea"…) never trigger it.
+ */
+function mentionsAbsentMaterial(text: string, shippedIds: readonly string[]): boolean {
+  const shipped = new Set(shippedIds)
+  const tokens = new Set(text.toLowerCase().split(/[^a-z-]+/))
+  for (const entry of CATALOG_ENTRY_TOKENS) {
+    if (shipped.has(entry.id)) continue
+    if (entry.words.length < 2 && entry.words[0].length < 6) continue
+    if (entry.words.every((word) => tokens.has(word))) return true
+  }
+  return false
+}
+
+/**
+ * Two directions should not be near-duplicates: reject a candidate whose blend
+ * overlaps an accepted one on ~three quarters or more of the shared palette.
+ */
+function overlapsWithAnother(ids: string[], usedSets: readonly Set<string>[]): boolean {
+  const candidate = new Set(ids)
+  return usedSets.some((set) => {
+    let shared = 0
+    for (const id of set) if (candidate.has(id)) shared++
+    const union = new Set([...set, ...candidate]).size
+    return union > 0 && shared / union >= 0.75
+  })
+}
+
+/**
+ * Brief-fit gate: a direction must land near the studio-computed target
+ * (freshness, sweetness, warmth, intensity). Thresholds are generous — too !=
+ * the target by roughly 3+ scale points across two attributes is what begins
+ * to punish; far more means the direction contradicts what the customer asked
+ * for. Bold is allowed to wander.
+ */
+function fitsBrief(
+  profile: ScentProfile,
+  tier: RecommendationTier,
+  target: ReturnType<typeof buildTarget>,
+): boolean {
+  const distance = Math.sqrt(
+    (profile.freshness - target.freshness) ** 2 +
+      (profile.sweetness - target.sweetness) ** 2 +
+      (profile.warmth - target.warmth) ** 2 +
+      (profile.intensity - target.intensity) ** 2,
+  )
+  const cap = tier === 'Safe' ? 7 : tier === 'Balanced' ? 9 : Number.POSITIVE_INFINITY
+  return distance <= cap
+}
 
 function sortTiers(recs: ConciergeRecommendation[]): ConciergeRecommendation[] {
   return [...recs].sort((a, b) => TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier))
@@ -190,19 +348,26 @@ function incompleteComposition(ids: string[]): boolean {
   return ids.length > 7
 }
 
+/**
+ * Adopt the model's copy over a deterministic direction, but only while it
+ * cannot contradict the notes we actually ship: text that still names a
+ * proposed material that did not survive validation keeps the studio copy.
+ */
 function applyAiCopy(
   rec: ConciergeRecommendation,
   raw: { name?: string; summary?: string; explanation?: string },
+  proposedNames: readonly string[],
+  shippedNames: readonly string[],
 ): ConciergeRecommendation {
-  const profile = rec.profile
+  const dropped = proposedNames.filter((name) => !shippedNames.includes(name))
   const name = sanitizeText(raw.name ?? '', 40)
   const summary = sanitizeText(raw.summary ?? '', 200)
   const explanation = sanitizeText(raw.explanation ?? '', 650)
+  const staysConsistent = (value: string) => !mentionsAny(value, dropped)
   return {
     ...rec,
     name: name.length >= 2 ? name : rec.name,
-    summary: summary.length >= 10 ? summary : rec.summary,
-    explanation: explanation.length >= 20 ? explanation : rec.explanation,
-    profile,
+    summary: summary.length >= 10 && staysConsistent(summary) ? summary : rec.summary,
+    explanation: explanation.length >= 20 && staysConsistent(explanation) ? explanation : rec.explanation,
   }
 }

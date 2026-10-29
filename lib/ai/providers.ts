@@ -82,6 +82,15 @@ function expectedShape(mode: 'builder' | 'concierge'): string {
   return mode === 'builder' ? BUILDER_FORMAT_REMINDER : CONCIERGE_FORMAT_REMINDER
 }
 
+/**
+ * Builder edits demand precision (bad actions get dropped server-side, which
+ * wastes the request), while concierge copy benefits from more latitude.
+ */
+const TEMPERATURE_BY_MODE: Record<GenerateParams['mode'], number> = {
+  builder: 0.55,
+  concierge: 0.75,
+}
+
 // ─── Provider calls ─────────────────────────────────────────────────────────
 
 async function callGemini(params: GenerateParams, model: string, maxOutputTokens: number): Promise<string> {
@@ -101,7 +110,7 @@ async function callGemini(params: GenerateParams, model: string, maxOutputTokens
         responseMimeType: 'application/json',
         responseSchema: params.mode === 'builder' ? GEMINI_SCHEMA_BUILDER : GEMINI_SCHEMA_CONCIERGE,
         maxOutputTokens,
-        temperature: 0.7,
+        temperature: TEMPERATURE_BY_MODE[params.mode],
         abortSignal: controller.signal,
       },
     })
@@ -152,7 +161,7 @@ async function callGroq(params: GenerateParams, model: string, maxOutputTokens: 
         { role: 'user', content: `${params.user}\n\n${expectedShape(params.mode)}` },
       ],
       ...(jsonMode ? { response_format: { type: 'json_object' as const } } : {}),
-      temperature: 0.7,
+      temperature: TEMPERATURE_BY_MODE[params.mode],
       max_completion_tokens: tokenBudget,
       ...reasoningOptions,
     })

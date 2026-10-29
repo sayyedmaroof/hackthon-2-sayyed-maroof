@@ -16,7 +16,7 @@ import { getAiConfig, hasAnyProvider } from './config'
 import { generateWithFallback } from './providers'
 import { builderSystemPrompt, builderUserPrompt, type BuilderPromptInput } from './prompts'
 import { builderActionSchema, builderOutputSchema, type BuilderClientAction } from './schemas'
-import { simulatePlan, type PlanAction } from './plan'
+import { simulatePlan, type PlanAction, type PlanStepFail } from './plan'
 import type { z } from 'zod'
 
 type RawBuilderAction = z.infer<typeof builderActionSchema>
@@ -42,7 +42,8 @@ function profileSummary(ids: string[], concentration: Concentration): string {
   const profile = computeProfile(ids, concentration)
   if (!profile) return 'The blend is empty — describe or add opening materials.'
   const top2 = profile.familyMix.slice(0, 2).map((m) => `${m.family} ${Math.round(m.share * 100)}%`).join(', ')
-  return `${profile.family}-led (${top2}), character ${profile.character}, freshness ${profile.freshness}/10, sweetness ${profile.sweetness}/10, warmth ${profile.warmth}/10, intensity ${profile.intensity}/10, longevity ${profile.longevity}/10 (~${longevityHours(profile.longevity)}), projection ${profile.projection}/10, crowd appeal ${profile.crowdAppeal}/10 at ${concentration.toUpperCase()}.`
+  const pyramid = `pyramid ${Math.round(profile.pyramid.top * 100)}% top, ${Math.round(profile.pyramid.middle * 100)}% heart, ${Math.round(profile.pyramid.base * 100)}% base`
+  return `${profile.family}-led (${top2}), character ${profile.character}, freshness ${profile.freshness}/10, sweetness ${profile.sweetness}/10, warmth ${profile.warmth}/10, intensity ${profile.intensity}/10, longevity ${profile.longevity}/10 (~${longevityHours(profile.longevity)}), projection ${profile.projection}/10, crowd appeal ${profile.crowdAppeal}/10, ${pyramid}, at ${concentration.toUpperCase()}.`
 }
 
 function validationSummary(ids: string[], concentration: Concentration): string {
@@ -51,61 +52,95 @@ function validationSummary(ids: string[], concentration: Concentration): string 
   if (check.missingLayers.length) {
     parts.push(`missing ${check.missingLayers.map(layerWord).join(' and ')} layer`)
   }
-  if (check.issues.length) {
-    parts.push(`clash: ${check.issues[0].rule.reason}`)
+  for (const issue of check.issues.slice(0, 2)) {
+    parts.push(`clash: ${issue.rule.reason}`)
   }
-  if (check.warnings.length) {
-    parts.push(`advisory: ${check.warnings[0].message.slice(0, 160)}`)
+  const warningCount = check.warnings.length
+  if (warningCount) {
+    parts.push(`advisory: ${check.warnings[0].message.slice(0, 180)}${warningCount > 1 ? ` (+${warningCount - 1} more advisory items)` : ''}`)
   }
-  return parts.length ? parts.join('; ') : 'no clashes, all layers present.'
+  if (!parts.length) return 'no clashes, all layers present.'
+  return parts.join('; ')
 }
 
 const layerWord = (layer: 'top' | 'middle' | 'base') =>
   layer === 'middle' ? 'heart' : layer
+
+/** Signature of a concrete composition step, used to drop duplicated work. */
+function actionSignature(action: RawBuilderAction): string {
+  if (action.type === 'ADD' || action.type === 'REMOVE') return `${action.type}:${action.noteId}`
+  if (action.type === 'REPLACE') return `${action.type}:${action.oldId}>${action.newId}`
+  if (action.type === 'SET_CONCENTRATION') return `${action.type}:${action.value}`
+  return 'EXPLAIN'
+}
 
 /** Validate + simulate the model's actions; drop steps that break the rules. */
 function sanitizeActions(
   raw: readonly RawBuilderAction[],
   ids: readonly string[],
   concentration: Concentration,
-): { actions: BuilderClientAction[]; planValid: boolean; planError?: string } {
+): { actions: BuilderClientAction[]; planValid: boolean; planError?: string; dropped: number } {
   const allowedIds = new Set(Object.keys(NOTES_BY_ID))
+  const seenSignatures = new Set<string>()
   const planActions: PlanAction[] = []
+  let dropped = 0
   for (const a of raw) {
     if (a.type === 'EXPLAIN') continue
+    const signature = actionSignature(a)
+    if (a.type === 'REPLACE' && a.oldId === a.newId) {
+      // A no-op swap would silently re-commit the same blend as a "change".
+      dropped++
+      continue
+    }
+    if (seenSignatures.has(signature)) {
+      dropped++
+      continue
+    }
     if (a.type === 'ADD' || a.type === 'REMOVE') {
       if (!allowedIds.has(a.noteId)) continue
+      seenSignatures.add(signature)
       planActions.push({ type: a.type, noteId: a.noteId, reason: a.reason })
     } else if (a.type === 'REPLACE') {
       if (!allowedIds.has(a.oldId) || !allowedIds.has(a.newId)) continue
+      seenSignatures.add(signature)
       planActions.push({ type: 'REPLACE', oldId: a.oldId, newId: a.newId, reason: a.reason })
     } else if (a.type === 'SET_CONCENTRATION') {
+      if (a.value === concentration) continue // already current — keep the reply honest
+      seenSignatures.add(signature)
       planActions.push({ type: 'SET_CONCENTRATION', value: a.value, reason: a.reason })
     }
   }
 
-  const sim = simulatePlan(ids, concentration, planActions)
-  if (sim.ok) {
-    return { actions: planActions as unknown as BuilderClientAction[], planValid: true }
+  if (planActions.length === 0) {
+    // Nothing proposed remains that touches the composition: the reply text
+    // must still reach the client, but there is no plan to apply.
+    return { actions: [], planValid: true, dropped }
   }
 
-  // Repair: drop the steps that broke validation and re-simulate the rest.
-  const working = [...planActions]
-  for (const step of sim.steps) {
-    if (!step.ok) {
-      const index = working.indexOf(step.action)
-      if (index >= 0) working.splice(index, 1)
-    }
+  let working = [...planActions]
+  let sim = simulatePlan(ids, concentration, working)
+  while (!sim.ok) {
+    const failing = sim.steps.find((step): step is PlanStepFail => !step.ok)
+    if (!failing) break
+    const index = working.indexOf(failing.action)
+    if (index < 0) break
+    working.splice(index, 1)
+    dropped++
+    if (working.length === 0) break
+    sim = simulatePlan(ids, concentration, working)
   }
-  const repair = simulatePlan(ids, concentration, working)
-  if (repair.ok && working.length > 0) {
-    return { actions: working as unknown as BuilderClientAction[], planValid: true }
+
+  if (sim.ok && working.length > 0) {
+    return { actions: working as unknown as BuilderClientAction[], planValid: true, dropped }
   }
-  const firstFailure = repair.steps.find((step) => !step.ok) ?? sim.steps.find((step) => !step.ok)
+  const firstFailure =
+    sim.steps.find((step): step is PlanStepFail => !step.ok) ??
+    simulatePlan(ids, concentration, planActions).steps.find((step): step is PlanStepFail => !step.ok)
   return {
     actions: [],
     planValid: false,
-    planError: firstFailure && !firstFailure.ok ? firstFailure.message : 'The suggested change would make the blend incoherent.',
+    dropped,
+    planError: firstFailure ? firstFailure.message : 'The suggested change would make the blend incoherent.',
   }
 }
 
@@ -180,8 +215,17 @@ export async function runBuilderAI(input: BuilderInput): Promise<BuilderResult> 
   }
 
   const sanitized = sanitizeActions(result.data.actions, ids, concentration)
+  let reply = result.data.reply.slice(0, 1200)
+  if (sanitized.planValid && sanitized.dropped > 0) {
+    // The model may have narrated changes that did not survive validation.
+    // Keep the reply honest about what the final proposal actually contains.
+    reply +=
+      sanitized.dropped === 1
+        ? '\n\nOne suggested change did not fit your current blend, so it was left out.'
+        : `\n\n${sanitized.dropped} suggested changes did not fit your current blend, so they were left out.`
+  }
   return {
-    reply: result.data.reply.slice(0, 1200),
+    reply,
     actions: sanitized.actions,
     planValid: sanitized.planValid,
     planError: sanitized.planError,

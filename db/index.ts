@@ -1,15 +1,17 @@
 import postgres from 'postgres'
 import { drizzle } from 'drizzle-orm/postgres-js'
 import * as schema from './schema'
+import { DATABASE_URL } from '../lib/app-config'
 
 export const SESSION_COOKIE = 'sb_session'
 
 // Cache the connection across dev hot reloads and serverless invocations.
+// The connection string is app-configured (lib/app-config.ts), not env-based.
 function getDatabaseUrl(): string {
-  if (!process.env.DATABASE_URL) {
-    throw new Error('DATABASE_URL is not set. Add it to .env.local.')
+  if (!DATABASE_URL) {
+    throw new Error('DATABASE_URL is not configured. Set it in lib/app-config.ts.')
   }
-  return process.env.DATABASE_URL
+  return DATABASE_URL
 }
 
 function createSql() {
