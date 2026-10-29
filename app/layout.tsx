@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import { Cormorant_Garamond, Inter } from 'next/font/google'
 import { BackToTop } from '@/components/ui/back-to-top'
 import { ScrollProgress } from '@/components/scroll-progress'
+import { PWARegister } from '@/components/pwa-register'
 import { AuthDialog } from '@/components/auth-dialog'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
@@ -70,6 +71,7 @@ export default function RootLayout({
             />
             <BackToTop />
             <AuthDialog />
+            <PWARegister />
           </StudioProvider>
         </AuthProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
