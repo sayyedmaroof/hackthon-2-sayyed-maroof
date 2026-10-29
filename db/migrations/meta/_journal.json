@@ -22,6 +22,13 @@
       "when": 1793266585669,
       "tag": "0002_dear_storm",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793268993710,
+      "tag": "0003_add_shipping_address",
+      "breakpoints": true
     }
   ]
 }

@@ -1,3 +1,5 @@
+import path from 'node:path'
+
 /**
  * Runs once when the Next.js server boots (dev or production).
  * Keeps the PostgreSQL schema in sync by applying pending Drizzle
@@ -15,7 +17,7 @@ export async function register() {
       import('./db'),
     ])
 
-    await migrate(db, { migrationsFolder: './db/migrations' })
+    await migrate(db, { migrationsFolder: path.join(process.cwd(), 'db/migrations') })
     console.log('[startup] database migrations are up to date.')
   } catch (error) {
     // Never crash the app because the database is unreachable; routes that

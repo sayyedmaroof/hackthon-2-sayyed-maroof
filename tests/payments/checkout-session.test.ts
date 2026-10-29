@@ -92,6 +92,14 @@ describe('createCheckoutSessionForOrder', () => {
       orderId: 'order_uuid',
       reference: 'SB-ABCDEFGHJK',
       customerEmail: 'jane@example.com',
+      shippingAddress: {
+        line1: '123 Main Street',
+        line2: '',
+        city: 'New York',
+        state: 'NY',
+        postalCode: '10001',
+        country: 'United States',
+      },
       computed,
       generation: 0,
     })
@@ -116,6 +124,11 @@ describe('createCheckoutSessionForOrder', () => {
     expect(params.metadata).toEqual({
       orderId: 'order_uuid',
       orderRef: 'SB-ABCDEFGHJK',
+      shipping_line1: '123 Main Street',
+      shipping_city: 'New York',
+      shipping_state: 'NY',
+      shipping_postal_code: '10001',
+      shipping_country: 'United States',
     })
     expect(params.payment_intent_data?.metadata).toEqual({
       orderId: 'order_uuid',
@@ -137,6 +150,14 @@ describe('createCheckoutSessionForOrder', () => {
       orderId: 'order_uuid',
       reference: 'SB-ABCDEFGHJK',
       customerEmail: 'jane@example.com',
+      shippingAddress: {
+        line1: '123 Main Street',
+        line2: '',
+        city: 'New York',
+        state: 'NY',
+        postalCode: '10001',
+        country: 'United States',
+      },
       computed,
       generation: 2,
     })
