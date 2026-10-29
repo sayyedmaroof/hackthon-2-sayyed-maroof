@@ -1,12 +1,14 @@
 'use client'
 
-import { useState } from 'react'
-import { ArrowRight, Compass, Sparkles, Wand2 } from 'lucide-react'
+import { useCallback, useRef, useState } from 'react'
+import { AlertCircle, ArrowRight, Compass, Loader2, Sparkles, Wand2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useStudio } from '@/lib/studio-store'
 import { recommendBlends } from '@/lib/concierge'
 import { calculatePrice, formatPrice } from '@/lib/pricing'
 import { FAMILY_LABELS, NOTES_BY_ID } from '@/lib/fragrance-data'
+import type { ApiResponse, ConciergeApiResponse } from '@/lib/ai/schemas'
+import type { ConciergeRecommendation, Family } from '@/lib/types'
 import { Walkthrough, type WalkthroughStep } from '@/components/walkthrough'
 import { cn } from '@/lib/utils'
 
@@ -61,28 +63,110 @@ export default function ConciergePage() {
   const [avoid, setAvoid] = useState('')
   const [freeText, setFreeText] = useState('')
   const [recommendations, setRecommendations] = useState<
-    ReturnType<typeof recommendBlends>
+    ConciergeRecommendation[]
   >([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [progress, setProgress] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [sourceNote, setSourceNote] = useState<string | null>(null)
+  const [inspiration, setInspiration] = useState<
+    ConciergeApiResponse['inspiration']
+  >(undefined)
   const [tourReplay, setTourReplay] = useState(0)
+  const requestSeq = useRef(0)
 
-  const handleSubmit = () => {
+  /** Local deterministic composition — also the recovery path when the AI
+   *  service is unavailable. Intensity and exclusions apply identically. */
+  const runOffline = useCallback(
+    (avoidList: string[]) => {
+      const next = recommendBlends({
+        mood,
+        occasion,
+        families: selected as Family[],
+        intensity,
+        freeText,
+        avoid: avoidList,
+      })
+      setRecommendations(next)
+      setSourceNote('Composed with the studio’s offline engine — your preferences are unchanged.')
+      return next
+    },
+    [mood, occasion, selected, intensity, freeText],
+  )
+
+  const handleSubmit = async () => {
+    if (isSubmitting) return
     const avoidList = avoid
       .split(',')
-      .map(s => s.trim().toLowerCase())
+      .map(s => s.trim())
       .filter(Boolean)
 
-    const next = recommendBlends({
-      mood,
-      occasion,
-      families: selected as any,
-      freeText,
-      avoid: avoidList,
-    })
-    setRecommendations(next)
+    setIsSubmitting(true)
+    setError(null)
+    setProgress('Reading your preferences…')
+    const requestId = ++requestSeq.current
+
+    // Keep a handle so slow responses can't duplicate.
+    const timer = setTimeout(() => setProgress('Composing your recommendations…'), 1600)
+
+    let result: ConciergeApiResponse | null = null
+    let errorMessage: string | null = null
+    try {
+      const res = await fetch('/api/ai/fragrance', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          mode: 'concierge',
+          preferences: {
+            mood,
+            occasion,
+            intensity,
+            families: selected,
+            avoid: avoidList,
+            freeText,
+          },
+        }),
+        signal: AbortSignal.timeout(20_000),
+      })
+      const json = (await res.json().catch(() => null)) as ApiResponse | null
+      if (json && json.ok && json.mode === 'concierge') {
+        result = json
+      } else if (json && !json.ok) {
+        errorMessage = json.error.message
+      } else {
+        errorMessage = 'The concierge could not be reached just now.'
+      }
+    } catch {
+      errorMessage = 'The concierge could not be reached just now.'
+    } finally {
+      clearTimeout(timer)
+    }
+
+    if (requestSeq.current !== requestId) {
+      setIsSubmitting(false)
+      return
+    }
+
+    if (result && result.recommendations.length === 3) {
+      setRecommendations(result.recommendations)
+      setInspiration(result.inspiration)
+      setSourceNote(
+        result.degraded
+          ? 'Composed with the studio’s offline engine — your preferences are unchanged.'
+          : null,
+      )
+      if (errorMessage) setError(null)
+    } else {
+      // Full local fallback; the user keeps every form value.
+      runOffline(avoidList)
+      if (errorMessage) setError(errorMessage)
+    }
+    setIsSubmitting(false)
+    setProgress('')
   }
 
   const handleLoadAndNavigate = (
-    recommendation: (typeof recommendations)[0],
+    recommendation: ConciergeRecommendation,
   ) => {
     loadBlend({
       name: recommendation.name,
@@ -249,12 +333,42 @@ export default function ConciergePage() {
               </label>
             </div>
 
+            {error && (
+              <div
+                className="flex items-start gap-2 rounded-2xl border border-[#E5C4B0] bg-[#FDF3EE] px-4 py-3 text-sm text-[#7A2A10]"
+                role="alert"
+              >
+                <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                <div>
+                  <p>{error}</p>
+                  <button
+                    type="button"
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    className="mt-1 text-xs font-medium text-[#1E63C8] transition-colors hover:text-[#0A1A52] disabled:opacity-50"
+                  >
+                    Try again with the offline engine
+                  </button>
+                </div>
+              </div>
+            )}
+
             <button
               type="button"
               onClick={handleSubmit}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#1E63C8] px-5 py-3 text-sm font-medium text-[#F5F9FD] transition-colors hover:bg-[#154FB8]"
+              disabled={isSubmitting}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#1E63C8] px-5 py-3 text-sm font-medium text-[#F5F9FD] transition-colors hover:bg-[#154FB8] disabled:cursor-not-allowed disabled:opacity-70"
             >
-              <Wand2 className="size-4" /> Generate recommendations
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                  {progress || 'Composing your recommendations…'}
+                </>
+              ) : (
+                <>
+                  <Wand2 className="size-4" /> Generate recommendations
+                </>
+              )}
             </button>
           </div>
         </section>
@@ -263,13 +377,33 @@ export default function ConciergePage() {
           data-walkthrough="concierge-results"
           className="space-y-5"
         >
-          {recommendations.length === 0 ? (
+          {recommendations.length === 0 && !isSubmitting ? (
             <div className="rounded-[2rem] border border-dashed border-[#CCDFF0] bg-[#FDFEFF] p-10 text-center text-[#5C728F]">
               Ask the concierge for three fragrance directions tailored to your
               mood and occasion.
             </div>
+          ) : isSubmitting && recommendations.length === 0 ? (
+            <div className="rounded-[2rem] border border-[#CCDFF0] bg-[#FDFEFF] p-10 text-center">
+              <Loader2 className="mx-auto size-6 animate-spin text-[#1E63C8]" aria-hidden="true" />
+              <p className="mt-3 text-sm font-medium text-[#0A1A52]" role="status">
+                {progress || 'Composing your recommendations…'}
+              </p>
+              <p className="mt-1 text-xs text-[#5C728F]">Safe, Balanced and Bold directions take a few seconds.</p>
+            </div>
           ) : (
-            recommendations.map(recommendation => {
+            <>
+              {sourceNote && (
+                <p className="rounded-full bg-[#E4EEF8] px-4 py-2 text-center text-xs text-[#5C728F]" role="note">
+                  {sourceNote}
+                </p>
+              )}
+              {inspiration && inspiration.length > 0 && (
+                <p className="text-center text-xs text-[#5C728F]">
+                  External inspiration (source: Perfume Picks):{' '}
+                  {inspiration.map(ref => `${ref.brand} ${ref.name}`).join(' · ')}
+                </p>
+              )}
+            {recommendations.map(recommendation => {
               const total = calculatePrice(recommendation.noteIds, {
                 size: 50,
                 concentration: 'edp',
@@ -337,7 +471,8 @@ export default function ConciergePage() {
                   </div>
                 </article>
               )
-            })
+            })}
+            </>
           )}
         </section>
       </div>
